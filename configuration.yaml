@@ -21,7 +21,7 @@ homeassistant:
 
 http:
 
-automation: !include automations.yaml
+automation: !include_dir_merge_list automations/
 script: !include scripts.yaml
 scene: !include scenes.yaml
 lovelace:
@@ -41,6 +41,10 @@ history:
 # logbook:
 
 mobile_app:
+
+google:
+  client_id: !secret google_client_id
+  client_secret: !secret google_client_secret
 
 device_tracker:
   - platform: eero_tracker

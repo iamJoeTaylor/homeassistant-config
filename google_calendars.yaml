@@ -1,0 +1,56 @@
+
+- cal_id: 6jqk32b1p1oab37tjpqs4g9gmk@group.calendar.google.com
+  entities:
+  - device_id: bella_summer_calendar
+    ignore_availability: true
+    name: Bella Summer Calendar
+    track: true
+
+- cal_id: kimtamashiro@gmail.com
+  entities:
+  - device_id: kimtamashiro_gmail_com
+    ignore_availability: true
+    name: kimtamashiro@gmail.com
+    track: true
+
+- cal_id: iamjoetaylor@gmail.com
+  entities:
+  - device_id: iamjoetaylor_gmail_com
+    ignore_availability: true
+    name: iamjoetaylor@gmail.com
+    track: true
+
+- cal_id: h7bk61n6hcv2k8tm9dot9id2vg@group.calendar.google.com
+  entities:
+  - device_id: belle
+    ignore_availability: true
+    name: Belle
+    track: true
+
+- cal_id: msf0f3dg5u6a03ldeqafdvpvco@group.calendar.google.com
+  entities:
+  - device_id: giants
+    ignore_availability: true
+    name: Giants
+    track: true
+
+- cal_id: addressbook#contacts@group.v.calendar.google.com
+  entities:
+  - device_id: contacts
+    ignore_availability: true
+    name: Contacts
+    track: true
+
+- cal_id: en.usa#holiday@group.v.calendar.google.com
+  entities:
+  - device_id: holidays_in_united_states
+    ignore_availability: true
+    name: Holidays in United States
+    track: true
+
+- cal_id: mlb_26_%53an+%46rancisco+%47iants#sports@group.v.calendar.google.com
+  entities:
+  - device_id: san_francisco_giants
+    ignore_availability: true
+    name: San Francisco Giants
+    track: true

@@ -1,0 +1,22 @@
+#########################################################
+#                                                       #
+#                 TRASH DAY REMINDER                    #
+#                                                       #
+#########################################################
+
+  - alias: Trash Day Reminder
+    initial_state: true
+    trigger:
+      platform: time
+      at: '18:00:00'
+    condition:
+      condition: time
+      weekday:
+        - wed
+    action:
+      service: notify.home_assistant
+      data:
+        title: "Today Is Trash Day"
+        message: "Take the trash and recycling to the curb"
+
+
