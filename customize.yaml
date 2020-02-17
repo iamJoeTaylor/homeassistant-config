@@ -1,0 +1,5 @@
+person.joe:
+  entity_picture: "/local/joe-icon.jpg"
+person.kim:
+  entity_picture: "/local/kim-icon.jpg"
+

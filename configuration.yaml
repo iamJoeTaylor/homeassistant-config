@@ -1,0 +1,119 @@
+## Section: Core config
+homeassistant:
+  # Name of the location where Home Assistant is running
+  name: Taylor Home
+  # Location required to calculate the time the sun rises and sets
+  latitude: !secret home_latitude
+  longitude: !secret home_longitude
+  # Impacts weather/sunrise data (altitude above sea level in meters)
+  elevation: !secret home_elevation
+  # metric for Metric, imperial for Imperial
+  unit_system: imperial
+  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  time_zone: America/Los_Angeles
+  customize: !include customize.yaml
+  auth_providers:
+    - type: homeassistant
+    - type: trusted_networks
+      trusted_networks:
+        - 192.168.7.173
+      allow_bypass_login: true
+
+http:
+
+automation: !include automation.yaml
+script: !include script.yaml
+scene: !include scenes.yaml
+
+# Enables configuration UI
+config:
+
+# Enables the frontend
+frontend:
+  themes: !include_dir_merge_named themes
+
+# Enables support for tracking state changes over time.
+history:
+
+# View all events in a logbook
+# logbook:
+
+mobile_app:
+
+device_tracker:
+  - platform: eero_tracker
+    consider_home: 300
+    new_device_defaults:
+        track_new_devices: true
+        hide_if_away: false
+    interval_seconds: 60 # Recommended...do not set this lower than 25, we don't want to DDOS Eero
+    # only_macs: "11:22:33:44:55:66, 22:22:22:22:22:22"  # Optional
+  - platform: bluetooth_tracker
+
+person:
+  - name: Joe
+    id: joe
+    device_trackers:
+      - device_tracker.joe_s_iphone_11
+      - device_tracker.joes_iphone
+  - name: Kim
+    id: kim
+    device_trackers:
+      - device_tracker.kim_s_iphone_x
+      - device_tracker.meow
+
+dyson:
+  language: US
+  username: !secret dyson_username
+  password: !secret dyson_password
+  devices:
+    - device_id: !secret dyson_device_id
+      device_ip: !secret dyson_device_ip
+
+# Simple Service Discovery Protocol
+ssdp:
+
+# Track the sun
+sun:
+
+system_health:
+
+# Checks for available updates
+updater:
+  include_used_components: true
+
+## Section: Integration Config
+
+ios:
+
+# Allows you to issue voice commands from the frontend in enabled browsers
+conversation:
+
+homekit:
+  auto_start: false
+  filter:
+    include_entities:
+    exclude_domains:
+    exclude_entities:
+
+## Section: Component configuration 
+
+group: !include group.yaml
+
+light:
+  - platform: group
+    name: Living Room Lights
+    entities:
+      - light.living_room_left
+      - light.living_room_middle_left
+      - light.living_room_middle_right
+      - light.living_room_right
+      - light.tripod_lamp
+
+# Discover some devices automatically
+discovery:
+  ignore:
+
+sensor: !include sensor.yaml
+
+binary_sensor:
