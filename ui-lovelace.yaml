@@ -106,11 +106,52 @@ views:
           ha-card {
             --st-mode-background: var(--paper-card-background-color);
             --st-mode-active-background: var(--paper-card-background-color);
+            --sidebar-selected-icon-color: var(--accent-color);
             --st-spacing: 4px;
             --st-font-size-m: 15px
             --st-font-size-xl: 40px;
             }
         type: 'custom:simple-thermostat'
+      - type: entities
+        entities:
+          - entity: fan.living_room
+            hide_when_off: true
+            name: Dyson
+            toggle: true
+            type: 'custom:slider-entity-row'
+          - type: 'custom:button-toolbar-redux'
+            style: |
+              ha-card {
+                --bt-toolbar-background: var(--paper-card-background-color);
+                --bt-icon-active-color: var(--accent-color)
+                }
+            toolbar:
+              - type: service
+                name: Toggle
+                icon: mdi:refresh
+                service:
+                  name: fan.oscillate
+                  entity: fan.living_room
+                  parameter: oscillating
+                  toggle: true
+              - type: service
+                name: Auto
+                icon: mdi:auto-fix
+                service:
+                  name: fan.set_speed
+                  entity: fan.living_room
+                  parameter: speed
+                  active: AUTO
+                  args:
+                    speed: AUTO
+              - type: service
+                name: Toggle
+                icon: mdi:weather-night
+                service:
+                  name: dyson.set_night_mode
+                  entity: fan.living_room
+                  parameter: night_mode
+                  toggle: true
       - cards:
           - entities:
               - entity: sensor.pi_temperature
@@ -162,7 +203,7 @@ views:
                 icon_color: '#ff8000'
             entity: light.living_room
             justify: between
-            size: 48
+            size: 36
             type: 'custom:rgb-light-card'
           - entity: light.hall
             hide_when_off: true
@@ -203,7 +244,7 @@ views:
                   - 0
             entity: light.hall
             justify: between
-            size: 48
+            size: 36
             type: 'custom:rgb-light-card'
         type: entities
       - type: entities
@@ -215,46 +256,6 @@ views:
           - entity: device_tracker.kim_tracker_presence
         show_header_toggle: false
         title: Home
-      - type: entities
-        entities:
-          - entity: fan.living_room
-            hide_when_off: true
-            name: Dyson
-            toggle: true
-            type: 'custom:slider-entity-row'
-          - type: 'custom:button-toolbar-redux'
-            style: |
-              ha-card {
-                --primary-color: var(--paper-card-background-color);
-                }
-            aspect_ratio: 1/1 # Optional, Default: 1/1
-            toolbar:
-              - type: service
-                name: Toggle
-                icon: mdi:refresh
-                service:
-                  name: fan.oscillate
-                  entity: fan.living_room
-                  parameter: oscillating
-                  toggle: true
-              - type: service
-                name: Toggle
-                icon: mdi:weather-night
-                service:
-                  name: dyson.set_night_mode
-                  entity: fan.living_room
-                  parameter: night_mode
-                  toggle: true
-              - type: service
-                name: Auto
-                icon: mdi:auto-fix
-                service:
-                  name: fan.set_speed
-                  entity: fan.living_room
-                  parameter: speed
-                  active: AUTO
-                  args:
-                    speed: AUTO
     icon: 'mdi:home'
     path: home
     theme: Google Dark Theme
