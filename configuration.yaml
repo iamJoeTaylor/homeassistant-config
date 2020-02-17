@@ -24,6 +24,8 @@ http:
 automation: !include automation.yaml
 script: !include script.yaml
 scene: !include scenes.yaml
+lovelace:
+  mode: yaml
 
 # Enables configuration UI
 config:
@@ -91,10 +93,6 @@ conversation:
 
 homekit:
   auto_start: false
-  filter:
-    include_entities:
-    exclude_domains:
-    exclude_entities:
 
 ## Section: Component configuration 
 
