@@ -11,6 +11,10 @@ entity_registry.yaml
 !custom_components
 !python_scripts
 !python_scripts/*
+!www
+!www/*
+!custom_components
+!custom_components/*
 !esphome
 !esphome/*
 /esphome/secrets.yaml

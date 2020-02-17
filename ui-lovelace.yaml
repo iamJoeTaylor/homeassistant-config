@@ -24,6 +24,8 @@ resources:
     url: /community_plugin/simple-thermostat/simple-thermostat.js
   - type: module
     url: /community_plugin/button-toolbar/button-toolbar.js
+  - type: module
+    url: /local/community/button-toolbar-redux/button-toolbar.js
 
 title: Home
 views:
@@ -220,6 +222,39 @@ views:
             name: Dyson
             toggle: true
             type: 'custom:slider-entity-row'
+          - type: 'custom:button-toolbar-redux'
+            style: |
+              ha-card {
+                --primary-color: var(--paper-card-background-color);
+                }
+            aspect_ratio: 1/1 # Optional, Default: 1/1
+            toolbar:
+              - type: service
+                name: Toggle
+                icon: mdi:refresh
+                service:
+                  name: fan.oscillate
+                  entity: fan.living_room
+                  parameter: oscillating
+                  toggle: true
+              - type: service
+                name: Toggle
+                icon: mdi:weather-night
+                service:
+                  name: dyson.set_night_mode
+                  entity: fan.living_room
+                  parameter: night_mode
+                  toggle: true
+              - type: service
+                name: Auto
+                icon: mdi:auto-fix
+                service:
+                  name: fan.set_speed
+                  entity: fan.living_room
+                  parameter: speed
+                  active: AUTO
+                  args:
+                    speed: AUTO
     icon: 'mdi:home'
     path: home
     theme: Google Dark Theme

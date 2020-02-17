@@ -21,8 +21,8 @@ homeassistant:
 
 http:
 
-automation: !include automation.yaml
-script: !include script.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
 scene: !include scenes.yaml
 lovelace:
   mode: yaml
@@ -96,7 +96,7 @@ homekit:
 
 ## Section: Component configuration 
 
-group: !include group.yaml
+group: !include groups.yaml
 
 light:
   - platform: group
