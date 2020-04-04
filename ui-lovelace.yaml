@@ -5,28 +5,6 @@ custom_header:
   elements_color: var(--app-header-text-color)
   tab_indicator_color: var(--state-icon-active-color)
 
-resources:
-  - type: module
-    url: /community_plugin/custom-header/custom-header.js
-  - type: module
-    url: /community_plugin/button-card/button-card.js
-  - type: module
-    url: /community_plugin/lovelace-card-mod/card-mod.js
-  - type: js
-    url: /community_plugin/light-entity-card/light-entity-card.js
-  - type: js
-    url: /community_plugin/rgb-light-card/card.js
-  - type: module
-    url: /community_plugin/mini-graph-card/mini-graph-card-bundle.js
-  - type: module
-    url: /community_plugin/lovelace-slider-entity-row/slider-entity-row.js
-  - type: module
-    url: /community_plugin/simple-thermostat/simple-thermostat.js
-  - type: module
-    url: /community_plugin/button-toolbar/button-toolbar.js
-  - type: module
-    url: /local/community/button-toolbar-redux/button-toolbar.js
-
 title: Home
 views:
   - badges:
@@ -71,7 +49,7 @@ views:
             name: Joe's Steps
             type: 'custom:mini-graph-card'
           - entities:
-              - entity: sensor.steps_2
+              - entity: sensor.steps_3
                 index: 0
             font_size: 75
             line_color: '#e74c3c'
@@ -250,6 +228,15 @@ views:
       - type: entities
         entities:
           - binary_sensor.lumi_lumi_vibration_aq1_03d4806c_1_1280
+      - type: entities
+        entities:
+          - entity: binary_sensor.front_door_status_sensor
+          - entity: binary_sensor.back_door_status_sensor
+          - entity: binary_sensor.studio_door_status_sensor
+      - type: entities
+        entities:
+          - group.power_bar
+          - switch.power_computer
       - type: entities
         entities:
           - entity: device_tracker.joe_tracker_presence

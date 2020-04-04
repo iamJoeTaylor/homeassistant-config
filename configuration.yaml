@@ -20,12 +20,35 @@ homeassistant:
       allow_bypass_login: true
 
 http:
+cloud:
 
 automation: !include_dir_merge_list automations/
 script: !include scripts.yaml
 scene: !include scenes.yaml
 lovelace:
   mode: yaml
+  resources:
+    - type: module
+      url: /community_plugin/custom-header/custom-header.js
+    - type: module
+      url: /community_plugin/button-card/button-card.js
+    - type: module
+      url: /community_plugin/lovelace-card-mod/card-mod.js
+    - type: js
+      url: /community_plugin/light-entity-card/light-entity-card.js
+    - type: js
+      url: /community_plugin/rgb-light-card/card.js
+    - type: module
+      url: /community_plugin/mini-graph-card/mini-graph-card-bundle.js
+    - type: module
+      url: /community_plugin/lovelace-slider-entity-row/slider-entity-row.js
+    - type: module
+      url: /community_plugin/simple-thermostat/simple-thermostat.js
+    - type: module
+      url: /community_plugin/button-toolbar/button-toolbar.js
+    - type: module
+      url: /local/community/button-toolbar-redux/button-toolbar.js
+
 
 # Enables configuration UI
 config:
@@ -112,10 +135,21 @@ light:
       - light.living_room_right
       - light.tripod_lamp
 
+tuya:
+  username: !secret tuya_un
+  password: !secret tuya_pw
+  country_code: 1
+
+# apple_tv:
+#   - host: 192.168.7.29
+#     login_id: !secret apple_tv_login_id
+#     name: Apple TV
+
 # Discover some devices automatically
 discovery:
   ignore:
 
 sensor: !include sensor.yaml
 
-binary_sensor:
+binary_sensor: !include binary_sensors.yaml
+

@@ -4,21 +4,21 @@
   - device_id: bella_summer_calendar
     ignore_availability: true
     name: Bella Summer Calendar
-    track: true
+    track: false
 
 - cal_id: kimtamashiro@gmail.com
   entities:
   - device_id: kimtamashiro_gmail_com
     ignore_availability: true
     name: kimtamashiro@gmail.com
-    track: true
+    track: false
 
 - cal_id: iamjoetaylor@gmail.com
   entities:
   - device_id: iamjoetaylor_gmail_com
     ignore_availability: true
     name: iamjoetaylor@gmail.com
-    track: true
+    track: false
 
 - cal_id: h7bk61n6hcv2k8tm9dot9id2vg@group.calendar.google.com
   entities:
@@ -32,14 +32,14 @@
   - device_id: giants
     ignore_availability: true
     name: Giants
-    track: true
+    track: false
 
 - cal_id: addressbook#contacts@group.v.calendar.google.com
   entities:
   - device_id: contacts
     ignore_availability: true
     name: Contacts
-    track: true
+    track: false
 
 - cal_id: en.usa#holiday@group.v.calendar.google.com
   entities:
@@ -53,4 +53,4 @@
   - device_id: san_francisco_giants
     ignore_availability: true
     name: San Francisco Giants
-    track: true
+    track: false
