@@ -1,0 +1,137 @@
+- alias: Turn on flood light when motion is detected
+  trigger:
+    platform: state
+    entity_id: binary_sensor.flood_light_zone
+    to: 'on'
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: sun.sun
+        state: 'below_horizon'
+  action:
+    entity_id: light.flood_light
+    service: light.turn_on
+    data:
+      brightness: 35
+
+- alias: Turn off flood light when motion is detected
+  trigger:
+    platform: state
+    entity_id: binary_sensor.flood_light_zone
+    to: 'off'
+    for:
+      minutes: 5
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: sun.sun
+        state: 'below_horizon'
+  action:
+    entity_id: light.flood_light
+    service: light.turn_off
+
+
+- alias: Kitchen light on
+  description: ''
+  trigger:
+    platform: state
+    entity_id: binary_sensor.kitchen_occupancy
+    to: 'on'
+  condition: []
+  action:
+    - service: switch.turn_on
+      entity_id: switch.kitchen_plug_left
+    - service: switch.turn_on
+      entity_id: switch.kitchen_plug_right
+
+- alias: Kitchen light off
+  description: ''
+  trigger:
+    platform: state
+    entity_id: binary_sensor.kitchen_occupancy
+    to: 'off'
+  condition: []
+  action:
+    - service: switch.turn_off
+      entity_id: switch.kitchen_plug_left
+    - service: switch.turn_off
+      entity_id: switch.kitchen_plug_right
+
+
+- alias: Ikea Button On
+  description: ''
+  trigger:
+  - device_id: 911eb9a08fa948d49d178ad32f18bbaf
+    domain: zha
+    platform: device
+    subtype: turn_on
+    type: remote_button_short_press
+  condition:
+  - condition: state
+    entity_id: light.living_room
+    state: 'off'
+  action:
+  - data:
+      brightness: 80
+    entity_id: light.living_room
+    service: light.turn_on
+  - data:
+      brightness: 80
+    entity_id: light.tripod_lamp
+    service: light.turn_on
+
+- alias: Ikea Button Off
+  description: ''
+  trigger:
+  - device_id: 911eb9a08fa948d49d178ad32f18bbaf
+    domain: zha
+    platform: device
+    subtype: turn_on
+    type: remote_button_short_press
+  condition:
+  - condition: state
+    entity_id: light.living_room
+    state: 'on'
+  action:
+  - entity_id: light.living_room
+    service: light.turn_off
+  - entity_id: light.tripod_lamp
+    service: light.turn_off
+
+- alias: Ikea Dim up
+  description: ''
+  trigger:
+  - device_id: 911eb9a08fa948d49d178ad32f18bbaf
+    domain: zha
+    platform: device
+    subtype: dim_up
+    type: remote_button_short_press
+  condition: []
+  action:
+  - service: light.turn_on
+    data_template:
+      entity_id: light.living_room
+      transition: '1'
+      brightness: >
+        {% set bri = state_attr('light.living_room', 'brightness') | int %}
+        {{ [bri+50, 249] | min }}
+
+- alias: Ikea Dim down
+  description: ''
+  trigger:
+  - device_id: 911eb9a08fa948d49d178ad32f18bbaf
+    domain: zha
+    platform: device
+    subtype: dim_down
+    type: remote_button_short_press
+  condition: []
+  action:
+  - service: light.turn_on
+    data_template:
+      entity_id: light.living_room
+      transition: '1'
+      brightness: >
+        {% set bri = state_attr('light.living_room', 'brightness') | int %}
+        {{ [bri-50, 0] | max }}

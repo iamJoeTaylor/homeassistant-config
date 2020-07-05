@@ -1,0 +1,98 @@
+- alias: Welcome home Joe
+  trigger:
+    platform: state
+    entity_id: binary_sensor.front_door
+    to: 'on'
+  condition:
+    - condition: state
+      entity_id: device_tracker.joe_tracker_presence
+      state: 'Just arrived'
+  action:
+    - service: notify.alexa_media_jarvis
+      data:
+        data:
+          type: tts
+        message: Welcome home. . . Lord of the manor. . . King of the castle!
+
+- alias: Turn on lights when Joe is home
+  trigger:
+    platform: state
+    entity_id: device_tracker.joe_tracker_presence, device_tracker.kim_tracker_presence
+    to: 'Just arrived'
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: sun.sun
+        state: 'below_horizon'
+      - condition: state
+        entity_id: light.living_room
+        state: 'off'
+  action:
+    entity_id: light.living_room
+    service: light.turn_on
+    data:
+      brightness: 80
+
+- alias: Turn on lights when Front Door is Opened
+  trigger:
+    platform: state
+    entity_id: binary_sensor.front_door
+    to: 'on'
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: sun.sun
+        state: 'below_horizon'
+      - condition: state
+        entity_id: light.living_room
+        state: 'off'
+  action:
+    entity_id: light.living_room
+    service: light.turn_on
+    data:
+      brightness: 80
+
+- alias: Front door TTS
+  trigger:
+    platform: state
+    entity_id: binary_sensor.front_door
+    to: 'on'
+  condition:
+    - condition: state
+      entity_id: device_tracker.joe_tracker_presence
+      state: 'Home'
+  action:
+    - service: notify.alexa_media_jarvis
+      data:
+        data:
+          type: tts
+        message: Front door open
+
+- alias: Back door TTS
+  trigger:
+    platform: state
+    entity_id: binary_sensor.back_door
+    to: 'on'
+  condition: []
+  action:
+    - service: notify.alexa_media_jarvis
+      data:
+        data:
+          type: tts
+        message: Back door open
+
+
+- alias: Studio door TTS
+  trigger:
+    platform: state
+    entity_id: binary_sensor.studio_door
+    to: 'on'
+  condition: []
+  action:
+    - service: notify.alexa_media_jarvis
+      data:
+        data:
+          type: tts
+        message: Studio door open

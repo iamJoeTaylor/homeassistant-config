@@ -54,3 +54,17 @@
     ignore_availability: true
     name: San Francisco Giants
     track: false
+
+- cal_id: 3qe3jr5bnaho5bguivp2n4ulus@group.calendar.google.com
+  entities:
+  - device_id: street_sweeping_ours
+    ignore_availability: true
+    name: Street Sweeping (Ours)
+    track: true
+
+- cal_id: 1gv8tiujfb78k6125po3fkliig@group.calendar.google.com
+  entities:
+  - device_id: street_sweeping_theirs
+    ignore_availability: true
+    name: Street Sweeping (Theirs)
+    track: true

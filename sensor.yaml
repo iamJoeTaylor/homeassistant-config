@@ -7,15 +7,7 @@
   # If errors occur, make sure configuration file is encoded as UTF-8
   unit_of_measurement: "°C"
   value_template: '{{ value | multiply(0.001) | round(1) }}'
-- platform: airvisual
-  api_key: 598b184c-c579-4752-9370-a8f939df990c
-  monitored_conditions:
-    - us
-  show_on_map: false
-  scan_interval: 300
-  city: Berkeley
-  state: California
-  country: USA
+
 - platform: time_date
   display_options:
     - 'time'

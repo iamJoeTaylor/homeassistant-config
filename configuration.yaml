@@ -21,6 +21,12 @@ homeassistant:
 
 http:
 cloud:
+airvisual:
+  api_key: !secret airvisual_api_key
+  geographies:
+      city: Berkeley
+      state: California
+      country: USA
 
 automation: !include_dir_merge_list automations/
 script: !include scripts.yaml
@@ -29,25 +35,36 @@ lovelace:
   mode: yaml
   resources:
     - type: module
-      url: /community_plugin/custom-header/custom-header.js
+      url: /hacsfiles/custom-header/custom-header.js
     - type: module
-      url: /community_plugin/button-card/button-card.js
+      url: /hacsfiles/button-card/button-card.js
     - type: module
-      url: /community_plugin/lovelace-card-mod/card-mod.js
+      url: /hacsfiles/lovelace-card-mod/card-mod.js
     - type: js
-      url: /community_plugin/light-entity-card/light-entity-card.js
+      url: /hacsfiles/light-entity-card/light-entity-card.js
     - type: js
-      url: /community_plugin/rgb-light-card/card.js
+      url: /hacsfiles/rgb-light-card/card.js
     - type: module
-      url: /community_plugin/mini-graph-card/mini-graph-card-bundle.js
+      url: /hacsfiles/mini-graph-card/mini-graph-card-bundle.js
     - type: module
-      url: /community_plugin/lovelace-slider-entity-row/slider-entity-row.js
+      url: /hacsfiles/lovelace-slider-entity-row/slider-entity-row.js
     - type: module
-      url: /community_plugin/simple-thermostat/simple-thermostat.js
+      url: /hacsfiles/simple-thermostat/simple-thermostat.js
     - type: module
-      url: /community_plugin/button-toolbar/button-toolbar.js
+      url: /hacsfiles/button-toolbar/button-toolbar.js
     - type: module
       url: /local/community/button-toolbar-redux/button-toolbar.js
+    # - type: module
+    #   url: /local/community/custom_notifications/custom-header.js
+  # Add more dashboards
+  dashboards:
+    lovelace-main:
+      mode: yaml
+      filename: ui-lovelace.yaml
+      title: Main
+      icon: mdi:tools
+      show_in_sidebar: true
+      require_admin: false
 
 
 # Enables configuration UI
@@ -74,7 +91,6 @@ device_tracker:
     consider_home: 300
     new_device_defaults:
         track_new_devices: true
-        hide_if_away: false
     interval_seconds: 60 # Recommended...do not set this lower than 25, we don't want to DDOS Eero
     # only_macs: "11:22:33:44:55:66, 22:22:22:22:22:22"  # Optional
   - platform: bluetooth_tracker
@@ -121,7 +137,7 @@ conversation:
 homekit:
   auto_start: false
 
-## Section: Component configuration 
+## Section: Component configuration
 
 group: !include groups.yaml
 
@@ -135,10 +151,10 @@ light:
       - light.living_room_right
       - light.tripod_lamp
 
-tuya:
-  username: !secret tuya_un
-  password: !secret tuya_pw
-  country_code: 1
+# tuya:
+#   username: !secret tuya_un
+#   password: !secret tuya_pw
+#   country_code: 1
 
 # apple_tv:
 #   - host: 192.168.7.29

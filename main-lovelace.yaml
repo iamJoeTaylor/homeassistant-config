@@ -7,85 +7,64 @@ custom_header:
 
 title: Home
 views:
-  - cards:
+  - badges:
+      - entity: person.joe
+      - entity: person.kim
+    cards:
       - cards:
-        - cards:
-            - entities:
-                - entity: sensor.dyson_temperature
-                  name: Living Room
-                  show_legend: false
-                  color: '#e74c3c'
-                - entity: sensor.master_room_temperature
-                  name: Bedroom Room
-                  show_legend: false
-                  color: '#EC6653'
-                - entity: sensor.dining_room_temperature
-                  name: Dining Room
-                  show_legend: false
-                  color: '#F1806B'
-                - entity: sensor.bella_room_temperature
-                  name: Bella's Room
-                  show_legend: false
-                  color: '#EE735F'
-              font_size: 75
-              line_color: '#e74c3c'
-              line_width: 2
-              name: Temp
-              type: 'custom:mini-graph-card'
-          type: horizontal-stack
-        - cards:
-            - entities:
-                - entity: sensor.dyson_humidity
-                  name: Living Room
-                  show_legend: false
-                  color: '#66C1E2'
-                - entity: sensor.master_room_humidity
-                  name: Bedroom Room
-                  show_legend: false
-                  color: '#46AEDD'
-                - entity: sensor.dining_room_humidity
-                  name: Dining Room
-                  show_legend: false
-                  color: '#3498DB'
-                - entity: sensor.bella_room_humidity
-                  name: Bella's Room
-                  show_legend: false
-                  color: '#2D84BE'
-              font_size: 75
-              icon: 'mdi:water-percent'
-              line_color: var(--accent-color)
-              line_width: 2
-              name: Humidity
-              type: 'custom:mini-graph-card'
-          type: horizontal-stack
-        - cards:
-            - entities:
-                - entity: sensor.steps
-                  index: 0
-              font_size: 75
-              line_color: var(--accent-color)
-              line_width: 8
-              name: Joe's Steps
-              type: 'custom:mini-graph-card'
-            - entities:
-                - entity: sensor.steps_3
-                  index: 0
-              font_size: 75
-              line_color: '#e74c3c'
-              line_width: 8
-              name: Kim's Steps
-              type: 'custom:mini-graph-card'
-            - entities:
-                - entity: sensor.dyson_aqi
-                  index: 0
-              font_size: 75
-              icon: 'mdi:chart-line'
-              line_color: green
-              line_width: 8
-              name: AQI
-              type: 'custom:mini-graph-card'
-          type: horizontal-stack
-        type: vertical-stack
+          - entities:
+              - entity: sensor.dyson_humidity
+                index: 0
+            font_size: 75
+            icon: 'mdi:water-percent'
+            line_color: var(--accent-color)
+            line_width: 8
+            name: Humidity
+            type: 'custom:mini-graph-card'
+          - entities:
+              - entity: sensor.dyson_temperature
+                index: 0
+            font_size: 75
+            line_color: '#e74c3c'
+            line_width: 8
+            name: Temp
+            type: 'custom:mini-graph-card'
+          - entities:
+              - entity: sensor.dyson_aqi
+                index: 0
+            font_size: 75
+            icon: 'mdi:chart-line'
+            line_color: green
+            line_width: 8
+            name: AQI
+            type: 'custom:mini-graph-card'
+        type: horizontal-stack
+      - cards:
+          - entities:
+              - entity: sensor.steps
+                index: 0
+            font_size: 75
+            line_color: var(--accent-color)
+            line_width: 8
+            name: Joe's Steps
+            type: 'custom:mini-graph-card'
+          - entities:
+              - entity: sensor.steps_3
+                index: 0
+            font_size: 75
+            line_color: '#e74c3c'
+            line_width: 8
+            name: Kim's Steps
+            type: 'custom:mini-graph-card'
+          - entities:
+              - entity: sensor.u_s_air_quality_index
+                index: 0
+            font_size: 75
+            line_color: green
+            line_width: 8
+            name: AQI
+            type: 'custom:mini-graph-card'
+        type: horizontal-stack
       - control:
           hvac:
             fan_only: false
@@ -137,10 +116,12 @@ views:
                 name: Auto
                 icon: mdi:auto-fix
                 service:
-                  name: dyson.set_auto_mode
+                  name: fan.set_speed
                   entity: fan.living_room
-                  parameter: auto_mode
-                  toggle: true
+                  parameter: speed
+                  active: AUTO
+                  args:
+                    speed: AUTO
               - type: service
                 name: Toggle
                 icon: mdi:weather-night
@@ -172,8 +153,7 @@ views:
             points_per_hour: 10
             type: 'custom:mini-graph-card'
         type: horizontal-stack
-      - show_header_toggle: false
-        entities:
+      - entities:
           - entity: light.living_room
             hide_when_off: true
             name: Living room
@@ -247,12 +227,13 @@ views:
         type: entities
       - type: entities
         entities:
+          - binary_sensor.lumi_lumi_vibration_aq1_03d4806c_1_1280
+      - type: entities
+        entities:
           - entity: binary_sensor.front_door_status_sensor
           - entity: binary_sensor.back_door_status_sensor
           - entity: binary_sensor.studio_door_status_sensor
-          - entity: light.flood_light
       - type: entities
-        show_header_toggle: false
         entities:
           - group.power_bar
           - switch.power_computer
