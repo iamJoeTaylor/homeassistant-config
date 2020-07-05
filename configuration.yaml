@@ -54,6 +54,8 @@ lovelace:
       url: /hacsfiles/button-toolbar/button-toolbar.js
     - type: module
       url: /local/community/button-toolbar-redux/button-toolbar.js
+    - type: module
+      url: /local/community/calendar_notification/calendar_notification.js
     # - type: module
     #   url: /local/community/custom_notifications/custom-header.js
   # Add more dashboards
