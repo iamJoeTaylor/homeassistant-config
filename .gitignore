@@ -22,7 +22,4 @@ entity_registry.yaml
 !esphome
 !esphome/*
 /esphome/secrets.yaml
-/esphome/air_sensor
-/esphome/garage_door
-/esphome/ir_blaster
 .DS_Store

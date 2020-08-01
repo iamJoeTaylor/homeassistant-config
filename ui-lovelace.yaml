@@ -13,10 +13,11 @@ views:
         cards:
 
           - type: "custom:calendar-notification"
-            title: "Calendar"
             entities:
-            - entity: calendar.street_sweeping_ours
-              color: red
+              - entity: calendar.street_sweeping_ours
+                color: red
+              - entity: calendar.street_sweeping_theirs
+                color: red
 
           # Three Columns
           - type: horizontal-stack

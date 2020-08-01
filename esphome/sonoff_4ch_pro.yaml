@@ -1,0 +1,89 @@
+esphome:
+  name: sonoff_4ch_pro   # Name of the Node.
+  platform: ESP8266      # Even if the chip is a ESP8285, they have the same family.
+  board: esp01_1m
+  on_boot:
+    priority: -100
+    then:
+      light.turn_on:
+        id: status_led
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_pw
+
+api:
+
+logger:
+
+ota:
+
+binary_sensor:
+  - platform: gpio
+    on_press:
+      then:
+        - switch.toggle: button_1
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "Sonoff 4CH Button 1"
+  - platform: gpio
+    on_press:
+      then:
+        - switch.toggle: button_2
+    pin:
+      number: GPIO9
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "Sonoff 4CH Button 2"
+  - platform: gpio
+    on_press:
+      then:
+        - switch.toggle: button_3
+    pin:
+      number: GPIO10
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "Sonoff 4CH Button 3"
+  - platform: gpio
+    on_press:
+      then:
+        - switch.toggle: button_4
+    pin:
+      number: GPIO14
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "Sonoff 4CH Button 4"
+  - platform: status
+    name: "Sonoff 4CH Status"
+
+switch:
+  - platform: gpio
+    id: button_1
+    name: "Sonoff 4CH Relay 1"
+    pin: GPIO12
+  - platform: gpio
+    id: button_2
+    name: "Sonoff 4CH Relay 2"
+    pin: GPIO5
+  - platform: gpio
+    id: button_3
+    name: "Sonoff 4CH Relay 3"
+    pin: GPIO4
+  - platform: gpio
+    id: button_4
+    name: "Sonoff 4CH Relay 4"
+    pin: GPIO15
+
+output:
+  - platform: esp8266_pwm
+    id: blue_led
+    pin: GPIO13
+    inverted: True
+
+light:
+  - platform: monochromatic
+    id: status_led
+    name: "Sonoff 4CH Blue LED"
+    output: blue_led
