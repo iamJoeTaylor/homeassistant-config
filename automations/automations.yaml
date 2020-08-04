@@ -1,4 +1,4 @@
-- alias: Notify if sprinklers left on for 30 minutes
+- alias: Notify if sprinklers left on for 20 minutes
   id: c72b1caa51424d049a2f144c1160d7c7
   trigger:
   - platform: state
@@ -9,11 +9,11 @@
     - switch.sonoff_4ch_relay_4
     to: 'on'
     for:
-      minutes: 50
+      minutes: 20
   action:
   - service: notify.mobile_app_joes_iphone
     data:
-      message: Sprinkler has been running for > 50 min
+      message: Sprinkler has been running for > 30 min
       data:
         push:
           sound:
@@ -21,10 +21,18 @@
             critical: 1
             volume: 1.0
 
-- alias: Water Frontyard
+- alias: Water Frontyard Morning
   id: d3b9ce0c8a7f4527b200174e076f9213
   trigger:
   - platform: time
     at: '04:00:00'
+  action:
+  - service: script.sprinkler_water_front
+
+- alias: Water Frontyard Afternoon
+  id: d5b9ce1c9a9f4528b200175e077f9213
+  trigger:
+  - platform: time
+    at: '14:00:00'
   action:
   - service: script.sprinkler_water_front

@@ -1,44 +1,44 @@
 sprinkler_water_front:
   alias: "Sprinkler Water Frontyard"
   sequence:
+    # Top
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_1
+
+    # Raised Bed
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_2
+
+    # Slope
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_3
+
+    # Street
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_4
-    - condition: time
-      weekday:
-      - mon
-      - tue
-      - wed
-      - thu
-      - fri
-      - sat
-      - sun
+    - condition: template
+      value_template: "{{now().strftime('%j')|int % 2 == 0}}"
     - delay: '00:01'
     - service: switch.turn_on
       entity_id: switch.sonoff_4ch_relay_1
-    - delay: '00:45'
+    - delay: '00:15'
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_1
     - delay: '00:01'
     - service: switch.turn_on
       entity_id: switch.sonoff_4ch_relay_2
-    - delay: '00:45'
+    - delay: '00:15'
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_2
     - delay: '00:01'
     - service: switch.turn_on
       entity_id: switch.sonoff_4ch_relay_3
-    - delay: '00:45'
+    - delay: '00:15'
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_3
     - delay: '00:01'
     - service: switch.turn_on
       entity_id: switch.sonoff_4ch_relay_4
-    - delay: '00:45'
+    - delay: '00:15'
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_4
