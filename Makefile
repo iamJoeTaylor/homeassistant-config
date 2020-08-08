@@ -17,6 +17,7 @@ deploy:
 	rsync -av --rsync-path="sudo rsync" $(BASE_DIR)/*.yaml $(REMOTE_HOST):$(REMOTE_CONFIG_DIR)/
 	rsync -av --rsync-path="sudo rsync" $(BASE_DIR)/automations/*.yaml $(REMOTE_HOST):$(REMOTE_CONFIG_DIR)/automations/
 	rsync -av --rsync-path="sudo rsync" $(BASE_DIR)/esphome/*.yaml $(REMOTE_HOST):$(REMOTE_CONFIG_DIR)/esphome/
+	rsync -av --rsync-path="sudo rsync" $(BASE_DIR)/ui/*.yaml $(REMOTE_HOST):$(REMOTE_CONFIG_DIR)/ui/
 
 .PHONY: pull-remote
 pull-remote:
@@ -24,6 +25,7 @@ pull-remote:
 	rsync -av $(REMOTE_HOST):$(REMOTE_CONFIG_DIR)/custom_components/ ./custom_components/
 	rsync -av $(REMOTE_HOST):$(REMOTE_CONFIG_DIR)/www/ ./www/
 	rsync -av $(REMOTE_HOST):$(REMOTE_CONFIG_DIR)/esphome/ ./esphome/
+	rsync -av $(REMOTE_HOST):$(REMOTE_CONFIG_DIR)/ui/ ./ui/
 
 .PHONY: deploy-scripts
 deploy-scripts:

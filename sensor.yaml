@@ -18,3 +18,117 @@
     - 'time_date'
     - 'time_utc'
     - 'beat'
+
+- platform: template
+  sensors:
+    sprinkler_status:
+      friendly_name_template: >-
+        {% if states('switch.sonoff_4ch_relay_1') == 'on' %}
+          Top Flat
+        {% elif states('switch.sonoff_4ch_relay_2') == 'on' %}
+          Raised Bed
+        {% elif states('switch.sonoff_4ch_relay_3') == 'on' %}
+          Slope
+        {% elif states('switch.sonoff_4ch_relay_4') == 'on' %}
+          Street
+        {% else %}
+          Water Status
+        {% endif %}
+      value_template: >-
+        {% if states('switch.sonoff_4ch_relay_1') == 'on' %}
+          {% set switch_last_changed = states.switch.sonoff_4ch_relay_1.last_changed %}
+        {% elif states('switch.sonoff_4ch_relay_2') == 'on' %}
+          {% set switch_last_changed = states.switch.sonoff_4ch_relay_2.last_changed %}
+        {% elif states('switch.sonoff_4ch_relay_3') == 'on' %}
+          {% set switch_last_changed = states.switch.sonoff_4ch_relay_3.last_changed %}
+        {% elif states('switch.sonoff_4ch_relay_4') == 'on' %}
+          {% set switch_last_changed = states.switch.sonoff_4ch_relay_4.last_changed %}
+        {% endif %}
+
+        {% if switch_last_changed is defined %}
+          {% set run_time = (15 * 60) %}
+          {% set time = run_time - (as_timestamp(now()) - as_timestamp(switch_last_changed)) %}
+          {% set minutes = ((time % 3600) / 60) | int %}
+          {% set hours = ((time % 86400) / 3600) | int %}
+          {% set days = (time / 86400) | int %}
+
+          {%- if time < 60 -%}
+            Less than a minute
+            {%- else -%}
+            {%- if days > 0 -%}
+              {{ days }}d
+            {%- endif -%}
+            {%- if hours > 0 -%}
+              {%- if days > 0 -%}
+                {{ ' ' }}
+              {%- endif -%}
+              {{ hours }}h
+            {%- endif -%}
+            {%- if minutes > 0 -%}
+              {%- if days > 0 or hours > 0 -%}
+                {{ ' ' }}
+              {%- endif -%}
+              {{ minutes }}m
+            {%- endif -%}
+          {%- endif -%}
+          {{ ' ' }} remaining
+        {% else %}
+          Not Watering
+        {% endif %}
+      icon_template: >
+        {% if
+          states('switch.sonoff_4ch_relay_1') == 'on' or
+          states('switch.sonoff_4ch_relay_2') == 'on' or
+          states('switch.sonoff_4ch_relay_3') == 'on' or
+          states('switch.sonoff_4ch_relay_4') == 'on'
+        %}
+          mdi:valve-open
+        {% else %} mdi:valve-closed
+        {% endif %}
+
+- platform: template
+  sensors:
+    sprinkler_last_run:
+      friendly_name: "Last Run"
+      value_template: >-
+        {% set zones = states.switch.sonoff_4ch_relay_1.last_changed,
+          states.switch.sonoff_4ch_relay_2.last_changed,
+          states.switch.sonoff_4ch_relay_3.last_changed,
+          states.switch.sonoff_4ch_relay_4.last_changed %}
+        {{(as_timestamp(zones|max)) |   timestamp_custom("%A, %d %h %H:%M") }}
+- platform: template
+  sensors:
+    sprinkler_next_run:
+      friendly_name: "Next Run"
+      value_template: >-
+        {% macro date_at(at_hour, date) -%}  
+          {{
+            strptime(
+                date |   timestamp_custom("%m/%d/%y") +
+                  " " + at_hour
+                , "%m/%d/%y %H"
+               )
+            }}
+         {%- endmacro %}
+
+        {% set today = as_timestamp(now()) %}
+        {% set tomorrow = (as_timestamp(now())+ (86400)) %}
+
+        {% if now().strftime('%j')|int % 2 == 0 %}
+          {% if now().hour < 4 %}
+            {# must be today 4am #}
+            {% set time = date_at("4", today) %}
+          {% elif now().hour < 14 %}
+            {# must be today 2pm #}
+            {% set time = date_at("14", today) %}
+          {% else %}
+            {# must be tomorrow 4am #}
+            {% set time = date_at("4", tomorrow) %}
+          {% endif %}
+        {% else %}
+          {# must be tomorrow 4am #}
+           {% set time = date_at("4", tomorrow) %}
+        {% endif %}
+
+        {{ as_timestamp(time) |   timestamp_custom("%A, %d %h %H:%M") }}
+

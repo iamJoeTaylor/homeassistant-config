@@ -45,4 +45,3 @@
         {% elif is_state('binary_sensor.studio_door', 'on') %}
            true
         {% endif %}
-
