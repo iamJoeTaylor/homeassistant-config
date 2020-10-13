@@ -48,41 +48,27 @@ views:
               cards: !include ui/column_4.yaml
 
 
+
   - panel: false
     icon: 'mdi:leaf'
     path: water
     theme: Google Dark Theme
     title: Yard
+    cards: !include ui/yard.yaml
+
+  - panel: false
+    icon: 'mdi:beach'
+    path: vacation
+    theme: Google Dark Theme
+    title: Vacation Mode
+    cards: !include ui/vacation.yaml
+
+
+  - panel: true
+    icon: 'mdi:graphql'
+    path: zigbee
+    theme: Google Dark Theme
+    title: Zigbee
     cards:
-      - type: entities
-        title: Info
-        show_header_toggle: false
-        entities:
-          - entity: sensor.sprinkler_status
-          - entity: sensor.sprinkler_last_run
-            icon: mdi:calendar-arrow-left
-          - entity: sensor.sprinkler_next_run
-            icon: mdi:calendar-arrow-right
-      - type: entities
-        show_header_toggle: false
-        entities:
-          - entity: switch.sonoff_4ch_relay_1
-            name: Top Flat
-          - entity: switch.sonoff_4ch_relay_2
-            name: Raised Bed
-          - entity: switch.sonoff_4ch_relay_3
-            name: Slope
-          - entity: switch.sonoff_4ch_relay_4
-            name: Street
-          - entity: binary_sensor.sonoff_4ch_status
-            name: Sonoff Status
-          - entity: binary_sensor.sonoff_4ch_button_1
-            name: Top Flat
-          - entity: binary_sensor.sonoff_4ch_button_2
-            name: Raised Bed
-          - entity: binary_sensor.sonoff_4ch_button_3
-            name: Slope
-          - entity: binary_sensor.sonoff_4ch_button_4
-            name: Water Status
-      - type: light
-        entity: light.sonoff_4ch_blue_led
+      - type: 'custom:zha-network-visualization-card'
+

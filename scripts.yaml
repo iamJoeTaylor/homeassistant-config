@@ -1,3 +1,22 @@
+sleep:
+  sequence:
+    - service: light.turn_off
+      entity_id: light.living_room
+    - service: light.turn_off
+      entity_id: light.hall
+    - service: media_player.turn_off
+      entity_id: media_player.samsung_un60d8000
+    - service: switch.turn_off
+      entity_id: switch.power_computer
+    - service: switch.turn_off
+      entity_id: group.power_bar
+
+set_hue_scene:
+  sequence:
+    - service: hue.hue_activate_scene
+      data_template:
+        group_name: "{{ group }}"
+        scene_name: "{{ scene }}"
 sprinkler_water_front:
   alias: "Sprinkler Water Frontyard"
   sequence:

@@ -1,3 +1,81 @@
+- platform: nut
+  name: CyberPower
+  host: 127.0.0.1
+  port: 3493
+  alias: cyberpower1
+  username: upsmon_local
+  password: local1
+  resources:
+    - ups.realpower.nominal
+    - ups.status.display
+    - battery.charge
+    - battery.runtime
+    - battery.voltage
+    - input.voltage
+    - output.voltage
+    - ups.beeper.status
+    - ups.load
+    - ups.status
+
+
+- platform: rest
+  name: 'PurpleAir'
+
+  resource: https://www.purpleair.com/json?show=76735
+  scan_interval: 60
+  force_update: true
+
+  value_template: >
+    {% macro calcAQI(Cp, Ih, Il, BPh, BPl) -%}
+      {{ (((Ih - Il)/(BPh - BPl)) * (Cp - BPl) + Il)|round }}   
+    {%- endmacro %}
+    # Use the 10m average of PM25 and assign it to variable
+    {% set pm25 = value_json.results[0].Stats.split(',')[1].split(':')[1] %}
+    {% if (pm25|float) > 1000 %}
+      invalid
+    {% elif (pm25|float) > 350.5 %}
+      {{ calcAQI((pm25|float), 500.0, 401.0, 500.0, 350.5) }}
+    {% elif (pm25|float) > 250.5 %}
+      {{ calcAQI((pm25|float), 400.0, 301.0, 350.4, 250.5) }}
+    {% elif (pm25|float) > 150.5 %}
+      {{ calcAQI((pm25|float), 300.0, 201.0, 250.4, 150.5) }}
+    {% elif (pm25|float) > 55.5 %}
+      {{ calcAQI((pm25|float), 200.0, 151.0, 150.4, 55.5) }}
+    {% elif (pm25|float) > 35.5 %}
+      {{ calcAQI((pm25|float), 150.0, 101.0, 55.4, 35.5) }}
+    {% elif (pm25|float) > 12.1 %}
+      {{ calcAQI((pm25|float), 100.0, 51.0, 35.4, 12.1) }}
+    {% elif (pm25|float) >= 0.0 %}
+      {{ calcAQI((pm25|float), 50.0, 0.0, 12.0, 0.0) }}
+    {% else %}
+      invalid
+    {% endif %}
+
+  unit_of_measurement: "AQI"
+  json_attributes:
+    - Stats
+    - PM2_5Value
+    - LastSeen
+    - LastUpdateCheck
+    - Label
+    - humidity
+    - pressure
+    - temp_f
+  json_attributes_path: "$.results[0]"
+
+- platform: template
+  sensors:
+    berkeley_temperature:
+      value_template: '{{ states.sensor.purpleair.attributes["temp_f"] }}'
+      device_class: temperature
+      unit_of_measurement: '°F'
+- platform: template
+  sensors:
+    berkeley_humidity:
+      value_template: '{{ states.sensor.purpleair.attributes["humidity"] }}'
+      unit_of_measurement: '%'
+
+
 - platform: systemmonitor
   resources:
     - type: processor_use
@@ -22,6 +100,7 @@
 - platform: template
   sensors:
     sprinkler_status:
+      entity_id: [sensor.date_time, switch.sonoff_4ch_relay_1, switch.sonoff_4ch_relay_2, switch.sonoff_4ch_relay_3, switch.sonoff_4ch_relay_4]
       friendly_name_template: >-
         {% if states('switch.sonoff_4ch_relay_1') == 'on' %}
           Top Flat
@@ -89,46 +168,72 @@
 - platform: template
   sensors:
     sprinkler_last_run:
+      entity_id: [sensor.date_time, switch.sonoff_4ch_relay_1, switch.sonoff_4ch_relay_2, switch.sonoff_4ch_relay_3, switch.sonoff_4ch_relay_4]
       friendly_name: "Last Run"
       value_template: >-
+        {% macro friendly_date(timestamp) -%}
+          {% if as_timestamp(now()) | timestamp_custom("%j") == timestamp | timestamp_custom("%j") %}
+            Today at {{timestamp | timestamp_custom("%H:%M")}}
+          {% elif (as_timestamp(now())- (86400)) | timestamp_custom("%j") == timestamp | timestamp_custom("%j") %}
+            Yesterday at {{timestamp | timestamp_custom("%H:%M")}}
+          {% else %}
+           {{timestamp | timestamp_custom("%A, %d %h %H:%M")}}
+          {% endif %}
+        {%- endmacro %}
         {% set zones = states.switch.sonoff_4ch_relay_1.last_changed,
           states.switch.sonoff_4ch_relay_2.last_changed,
           states.switch.sonoff_4ch_relay_3.last_changed,
           states.switch.sonoff_4ch_relay_4.last_changed %}
-        {{(as_timestamp(zones|max)) |   timestamp_custom("%A, %d %h %H:%M") }}
+        {{friendly_date(as_timestamp(zones|max)) }}
+
 - platform: template
   sensors:
     sprinkler_next_run:
+      entity_id: [sensor.date_time, switch.sonoff_4ch_relay_1, switch.sonoff_4ch_relay_2, switch.sonoff_4ch_relay_3, switch.sonoff_4ch_relay_4]
       friendly_name: "Next Run"
       value_template: >-
-        {% macro date_at(at_hour, date) -%}  
+        {% macro friendly_date(timestamp) -%}
+          {% if as_timestamp(now()) | timestamp_custom("%j") == timestamp | timestamp_custom("%j") %}
+            Today at {{timestamp | timestamp_custom("%H:%M")}}
+          {% elif (as_timestamp(now())+ (86400)) | timestamp_custom("%j") == timestamp | timestamp_custom("%j") %}
+            Tomorrow at {{timestamp | timestamp_custom("%H:%M")}}
+          {% else %}
+           {{timestamp | timestamp_custom("%A, %d %h %H:%M")}}
+          {% endif %}
+        {%- endmacro %}
+
+        {% macro date_at(at_hour, date) -%}
           {{
-            strptime(
-                date |   timestamp_custom("%m/%d/%y") +
-                  " " + at_hour
-                , "%m/%d/%y %H"
+            friendly_date(
+              as_timestamp(
+                strptime(
+                    date |   timestamp_custom("%m/%d/%y") +
+                      " " + at_hour
+                    , "%m/%d/%y %H"
+                   )
                )
+             )
             }}
          {%- endmacro %}
 
         {% set today = as_timestamp(now()) %}
         {% set tomorrow = (as_timestamp(now())+ (86400)) %}
+        {% set day_after_tomorrow = (as_timestamp(now())+ (2 * 86400)) %}
 
         {% if now().strftime('%j')|int % 2 == 0 %}
           {% if now().hour < 4 %}
             {# must be today 4am #}
-            {% set time = date_at("4", today) %}
+            {{date_at("4", today) }}
           {% elif now().hour < 14 %}
             {# must be today 2pm #}
-            {% set time = date_at("14", today) %}
+            {{date_at("14", today) }}
           {% else %}
-            {# must be tomorrow 4am #}
-            {% set time = date_at("4", tomorrow) %}
+            {# must be day_after_tomorrow 4am #}
+            {{date_at("4", day_after_tomorrow) }}
           {% endif %}
         {% else %}
           {# must be tomorrow 4am #}
-           {% set time = date_at("4", tomorrow) %}
+           {{date_at("4", tomorrow) }}
         {% endif %}
 
-        {{ as_timestamp(time) |   timestamp_custom("%A, %d %h %H:%M") }}
 

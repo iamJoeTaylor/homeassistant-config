@@ -31,6 +31,8 @@ airvisual:
 automation: !include_dir_merge_list automations/
 script: !include scripts.yaml
 scene: !include scenes.yaml
+input_boolean: !include input_booleans.yaml
+
 lovelace:
   mode: yaml
   resources:
@@ -52,6 +54,10 @@ lovelace:
       url: /hacsfiles/simple-thermostat/simple-thermostat.js
     - type: module
       url: /hacsfiles/button-toolbar/button-toolbar.js
+    - type: module
+      url: /hacsfiles/zha-network-card/zha-network-card.js
+    - type: module
+      url: /hacsfiles/zha-network-visualization-card/zha-network-visualization-card.js
     - type: module
       url: /local/community/button-toolbar-redux/button-toolbar.js
     - type: module
@@ -91,6 +97,8 @@ history:
 
 mobile_app:
 
+zha_map:
+
 google:
   client_id: !secret google_client_id
   client_secret: !secret google_client_secret
@@ -108,13 +116,11 @@ person:
   - name: Joe
     id: joe
     device_trackers:
-      - device_tracker.joe_s_iphone_11
-      - device_tracker.joes_iphone
+      - device_tracker.joes_iphone_2
   - name: Kim
     id: kim
     device_trackers:
-      - device_tracker.kim_s_iphone_x
-      - device_tracker.meow
+      - device_tracker.meow_3
 
 dyson:
   language: US
@@ -177,4 +183,27 @@ discovery:
 sensor: !include sensor.yaml
 
 binary_sensor: !include binary_sensors.yaml
+
+speedtestdotnet:
+  scan_interval:
+    minutes: 30
+  monitored_conditions:
+    - ping
+    - download
+    - upload
+
+circadian_lighting:
+
+switch:
+  - platform: circadian_lighting
+    name: Lights Circadian
+    lights_ct:
+      - light.living_room
+      - light.hall
+    lights_brightness:
+      - light.living_room
+      - light.hall
+    min_brightness: 20
+    max_brightness: 100
+
 

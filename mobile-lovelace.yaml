@@ -7,7 +7,12 @@ custom_header:
 
 title: Mobile
 views:
-  - cards:
+  - panel: true
+    icon: 'mdi:home'
+    path: mobile
+    theme: Google Dark Theme
+    title: Mobile
+    cards:
       # Main Single Full Width Column
       - type: vertical-stack
         cards:
@@ -37,10 +42,18 @@ views:
           - type: vertical-stack
             cards: !include ui/column_4.yaml
 
-
-    panel: true
-    icon: 'mdi:home'
-    path: mobile
+  - panel: true
+    icon: 'mdi:leaf'
+    path: water
     theme: Google Dark Theme
-    title: Mobile
+    title: Yard
+    cards: !include ui/yard.yaml
+
+  - panel: true
+    icon: 'mdi:beach'
+    path: vacation
+    theme: Google Dark Theme
+    title: Vacation Mode
+    cards: !include ui/vacation.yaml
+
 

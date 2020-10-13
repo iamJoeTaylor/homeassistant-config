@@ -1,6 +1,5 @@
 power_bar:
   name: Power Bar
   entities:
-    - switch.power_led
     - switch.power_tetris
 

@@ -1,0 +1,50 @@
+- alias: Turn on lights at night
+  trigger:
+  - platform: time
+    at: '17:00:00'
+  condition:
+    - condition: state
+      entity_id: input_boolean.vacation_mode
+      state: 'on'
+  action:
+    - delay: "00:{{ '{:02}'.format(range(0,30) | random | int) }}:00"
+    - service: light.turn_on
+      entity_id: light.living_room
+      data:
+        brightness: 35
+
+- alias: Turn off lights at night
+  trigger:
+  - platform: time
+    at: '23:00:00'
+  condition:
+    - condition: state
+      entity_id: input_boolean.vacation_mode
+      state: 'on'
+  action:
+    - delay: "00:{{ '{:02}'.format(range(0,30) | random | int) }}:00"
+    - service: light.turn_off
+      entity_id: light.living_room
+
+- alias: Notify if any doors open
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.back_door
+    - binary_sensor.front_door
+    - binary_sensor.studio_door
+    to: 'on'
+  condition:
+    - condition: state
+      entity_id: input_boolean.vacation_mode
+      state: 'on'
+  action:
+  - service: notify.mobile_app_joes_iphone
+    data:
+      message: A door was opened
+      data:
+        push:
+          sound:
+            name: default
+            critical: 1
+            volume: 1.0

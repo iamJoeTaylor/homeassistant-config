@@ -1,3 +1,36 @@
+- alias: Notify if sonoff disconnects
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.sonoff_4ch_status
+    to: 'off'
+    for:
+      minutes: 5
+  action:
+  - service: notify.mobile_app_joes_iphone
+    data:
+      message: Sonoff has disconnected
+      data:
+        push:
+          sound:
+            name: default
+            critical: 1
+            volume: 1.0
+  - service: switch.turn_off
+    entity_id: switch.sonoff_power_on_off
+
+- alias: Turn sonoff power back on
+  trigger:
+  - platform: state
+    entity_id:
+    - switch.sonoff_power_on_off
+    to: 'off'
+    for:
+      minutes: 2
+  action:
+  - service: switch.turn_on
+    entity_id: switch.sonoff_power_on_off
+
 - alias: Notify if sprinklers left on for 20 minutes
   id: c72b1caa51424d049a2f144c1160d7c7
   trigger:
@@ -20,6 +53,26 @@
             name: default
             critical: 1
             volume: 1.0
+  - service: switch.turn_off
+    entity_id: switch.sonoff_power_on_off
+
+- alias: Turn on porch at night
+  trigger:
+  - platform: time
+    at: '19:00:00'
+  action:
+    entity_id: light.porch_2
+    service: light.turn_on
+    data:
+      brightness: 10
+
+- alias: Turn off porch at night
+  trigger:
+  - platform: time
+    at: '00:00:00'
+  action:
+    entity_id: light.porch_2
+    service: light.turn_off
 
 - alias: Water Frontyard Morning
   id: d3b9ce0c8a7f4527b200174e076f9213
