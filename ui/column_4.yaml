@@ -1,0 +1,29 @@
+- type: entities
+  show_header_toggle: false
+  entities:
+    - entity: binary_sensor.front_door_status_sensor
+    - entity: binary_sensor.back_door_status_sensor
+    - entity: binary_sensor.studio_door_status_sensor
+    - entity: light.flood_light
+      icon: 'mdi:track-light'
+    - entity: switch.fountain_plug_on_off
+
+- type: entities
+  show_header_toggle: false
+  entities:
+    - group.power_bar
+    - switch.power_computer
+
+- type: entities
+  title: CyberPower
+  entities:
+    - entity: sensor.cyberpower1_battery_runtime
+      name: Runtime
+    - entity: sensor.cyberpower1_input_voltage
+      name: Input V
+    - entity: sensor.cyberpower1_load
+      name: Load
+    - entity: sensor.cyberpower1_nominal_real_power
+      name: Real Power
+    - entity: sensor.cyberpower1_status
+      name: Status

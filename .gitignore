@@ -2,6 +2,8 @@
 !*.yaml
 !automations
 !automations/*
+!ui
+!ui/*
 !scenes
 !.gitignore
 !Makefile

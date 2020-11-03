@@ -1,0 +1,105 @@
+- type: horizontal-stack
+  cards:
+    - entities:
+        - entity: sensor.berkeley_temperature
+          name: Berkeley
+          show_legend: false
+          color: orange
+        - entity: sensor.dining_room_temperature
+          name: Dining Room
+          show_legend: false
+          color: '#F1806B'
+        - entity: sensor.bella_room_temperature
+          name: Bella's Room
+          show_legend: false
+          color: '#EE735F'
+        - entity: sensor.master_room_temperature
+          name: Bedroom Room
+          show_legend: false
+          color: '#EC6653'
+        - entity: sensor.dyson_temperature
+          name: Living Room
+          show_legend: false
+          color: '#e74c3c'
+      font_size: 75
+      line_color: '#e74c3c'
+      line_width: 2
+      name: Temp
+      type: 'custom:mini-graph-card'
+
+- type: horizontal-stack
+  cards:
+    - entities:
+        - entity: sensor.berkeley_humidity
+          name: Berkeley
+          show_legend: false
+          color: '#8c4bd4'
+        - entity: sensor.dining_room_humidity
+          name: Dining Room
+          show_legend: false
+          color: '#3498DB'
+        - entity: sensor.bella_room_humidity
+          name: Bella's Room
+          show_legend: false
+          color: '#2D84BE'
+        - entity: sensor.dyson_humidity
+          name: Living Room
+          show_legend: false
+          color: '#66C1E2'
+        - entity: sensor.master_room_humidity
+          name: Bedroom Room
+          show_legend: false
+          color: '#46AEDD'
+      font_size: 75
+      icon: 'mdi:water-percent'
+      line_color: var(--accent-color)
+      line_width: 2
+      name: Humidity
+      type: 'custom:mini-graph-card'
+
+- type: horizontal-stack
+  cards:
+    - entities:
+        - entity: sensor.dyson_aqi
+          index: 0
+      font_size: 75
+      icon: 'mdi:chart-line'
+      line_color: green
+      line_width: 2
+      name: AQI
+      type: 'custom:mini-graph-card'
+
+- type: horizontal-stack
+  cards:
+    - entities:
+        - entity: sensor.joes_iphone_steps
+          index: 0
+      font_size: 75
+      line_color: var(--accent-color)
+      line_width: 8
+      name: Joe's Steps
+      type: 'custom:mini-graph-card'
+    - entities:
+        - entity: sensor.meow_steps
+          index: 0
+      font_size: 75
+      line_color: '#e74c3c'
+      line_width: 8
+      name: Kim's Steps
+      type: 'custom:mini-graph-card'
+    - entities:
+        - entity: sensor.u_s_air_quality_index
+          index: 0
+      font_size: 75
+      icon: 'mdi:chart-line'
+      color_thresholds:
+        - value: 50
+          color: "#f39c12"
+        - value: 100
+          color: "#d35400"
+        - value: 150
+          color: "#c0392b"
+      line_width: 8
+      name: Berkeley AQI
+      type: 'custom:mini-graph-card'
+

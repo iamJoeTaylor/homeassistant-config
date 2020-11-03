@@ -1,0 +1,82 @@
+- cards:
+    - entity: sensor.speedtest_download
+      graph: line
+      hours_to_show: 48
+      name: Down
+      type: sensor
+      unit: Mbps
+    - entity: sensor.speedtest_upload
+      graph: line
+      hours_to_show: 48
+      name: Up
+      type: sensor
+      unit: Mbps
+  type: horizontal-stack
+- type: horizontal-stack
+  cards:
+    - entities:
+        - entity: sensor.pi_temperature
+          index: 0
+      font_size: 75
+      hours_to_show: 3
+      line_color: green
+      line_width: 8
+      name: π Temp
+      points_per_hour: 10
+      symbol: Mb/s
+      type: 'custom:mini-graph-card'
+    - entities:
+        - entity: sensor.processor_use
+          index: 0
+      font_size: 75
+      hours_to_show: 3
+      line_color: orange
+      line_width: 8
+      name: π CPU
+      points_per_hour: 10
+      type: 'custom:mini-graph-card'
+
+- show_header_toggle: false
+  entities:
+    - entity: light.living_room
+      hide_when_off: true
+      name: Living room
+      toggle: true
+      type: 'custom:slider-entity-row'
+    - entity: light.living_room
+      hide_when_off: true
+      toggle: false
+      full_row: true
+      hide_state: true
+      attribute: color_temp
+      type: 'custom:slider-entity-row'
+    - entity: light.hall
+      hide_when_off: true
+      name: Hall
+      toggle: true
+      type: 'custom:slider-entity-row'
+    - entity: light.hall
+      hide_when_off: true
+      toggle: false
+      full_row: true
+      hide_state: true
+      attribute: color_temp
+      type: 'custom:slider-entity-row'
+    - switch.circadian_lighting_lights_circadian
+  type: entities
+
+# - type: entities
+#   entities:
+#     - entity: device_tracker.joe_tracker_presence
+#     - entity: device_tracker.kim_tracker_presence
+#   show_header_toggle: false
+#   title: Home
+
+
+- type: button
+  name: Sleep
+  show_state: false
+  tap_action:
+    action: call-service
+    service: script.sleep
+  icon: mdi:weather-night
