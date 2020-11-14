@@ -168,7 +168,7 @@
 - platform: template
   sensors:
     sprinkler_last_run:
-      entity_id: [sensor.date_time, switch.sonoff_4ch_relay_1, switch.sonoff_4ch_relay_2, switch.sonoff_4ch_relay_3, switch.sonoff_4ch_relay_4]
+      entity_id: [sensor.sprinkler_status, sensor.sprinkler_next_run, sensor.date_time, switch.sonoff_4ch_relay_1, switch.sonoff_4ch_relay_2, switch.sonoff_4ch_relay_3, switch.sonoff_4ch_relay_4]
       friendly_name: "Last Run"
       value_template: >-
         {% macro friendly_date(timestamp) -%}
@@ -189,7 +189,7 @@
 - platform: template
   sensors:
     sprinkler_next_run:
-      entity_id: [sensor.date_time, switch.sonoff_4ch_relay_1, switch.sonoff_4ch_relay_2, switch.sonoff_4ch_relay_3, switch.sonoff_4ch_relay_4]
+      entity_id: [sensor.sprinkler_status, sensor.sprinkler_last_run, sensor.date_time, switch.sonoff_4ch_relay_1, switch.sonoff_4ch_relay_2, switch.sonoff_4ch_relay_3, switch.sonoff_4ch_relay_4]
       friendly_name: "Next Run"
       value_template: >-
         {% macro friendly_date(timestamp) -%}

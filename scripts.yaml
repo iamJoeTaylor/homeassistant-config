@@ -10,6 +10,19 @@ sleep:
       entity_id: switch.power_computer
     - service: switch.turn_off
       entity_id: group.power_bar
+    - service: switch.turn_off
+      entity_id: switch.fountain_plug_on_off
+
+wakeup:
+  sequence:
+    - service: light.turn_on
+      entity_id: light.living_room
+    - service: light.turn_on
+      entity_id: light.hall
+    - service: switch.turn_on
+      entity_id: group.power_bar
+    - service: switch.turn_on
+      entity_id: switch.fountain_plug_on_off
 
 set_hue_scene:
   sequence:
@@ -17,6 +30,7 @@ set_hue_scene:
       data_template:
         group_name: "{{ group }}"
         scene_name: "{{ scene }}"
+
 sprinkler_water_front:
   alias: "Sprinkler Water Frontyard"
   sequence:
@@ -35,8 +49,7 @@ sprinkler_water_front:
     # Street
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_4
-    - condition: template
-      value_template: "{{now().strftime('%j')|int % 2 == 0}}"
+
     - delay: '00:01'
     - service: switch.turn_on
       entity_id: switch.sonoff_4ch_relay_1

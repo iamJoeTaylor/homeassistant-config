@@ -58,8 +58,8 @@
 
 - alias: Turn on porch at night
   trigger:
-  - platform: time
-    at: '19:00:00'
+    - platform: time
+      at: '19:00:00'
   action:
     entity_id: light.porch_2
     service: light.turn_on
@@ -77,15 +77,41 @@
 - alias: Water Frontyard Morning
   id: d3b9ce0c8a7f4527b200174e076f9213
   trigger:
-  - platform: time
-    at: '04:00:00'
+    - platform: time
+      at: '04:00:00'
+  condition:
+    condition: and
+    conditions:
+      - condition: template
+        value_template: "{{now().strftime('%j')|int % 2 == 0}}"
+      - condition:
+        condition: state
+        entity_id: input_boolean.skip_watering
+        state: 'off'
+      - condition:
+        condition: state
+        entity_id: input_boolean.turn_off_watering
+        state: 'off'
   action:
-  - service: script.sprinkler_water_front
+    - service: script.sprinkler_water_front
 
 - alias: Water Frontyard Afternoon
   id: d5b9ce1c9a9f4528b200175e077f9213
   trigger:
-  - platform: time
-    at: '14:00:00'
+    - platform: time
+      at: '14:00:00'
+  condition:
+    condition: and
+    conditions:
+      - condition: template
+        value_template: "{{now().strftime('%j')|int % 2 == 0}}"
+      - condition:
+        condition: state
+        entity_id: input_boolean.skip_watering
+        state: 'off'
+      - condition:
+        condition: state
+        entity_id: input_boolean.turn_off_watering
+        state: 'off'
   action:
-  - service: script.sprinkler_water_front
+    - service: script.sprinkler_water_front

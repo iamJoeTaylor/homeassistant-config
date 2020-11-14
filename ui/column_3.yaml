@@ -65,18 +65,33 @@
     - switch.circadian_lighting_lights_circadian
   type: entities
 
-# - type: entities
-#   entities:
-#     - entity: device_tracker.joe_tracker_presence
-#     - entity: device_tracker.kim_tracker_presence
-#   show_header_toggle: false
-#   title: Home
 
+- type: conditional
+  conditions:
+    - entity: light.living_room
+      state: "on"
+    - entity: light.hall
+      state: "on"
+  card:
+    type: button
+    name: Sleep
+    show_state: false
+    tap_action:
+      action: call-service
+      service: script.sleep
+    icon: mdi:weather-night
 
-- type: button
-  name: Sleep
-  show_state: false
-  tap_action:
-    action: call-service
-    service: script.sleep
-  icon: mdi:weather-night
+- type: conditional
+  conditions:
+    - entity: light.living_room
+      state: "off"
+    - entity: light.hall
+      state: "off"
+  card:
+    type: button
+    name: Wake up
+    show_state: false
+    tap_action:
+      action: call-service
+      service: script.wakeup
+    icon: mdi:weather-sunset

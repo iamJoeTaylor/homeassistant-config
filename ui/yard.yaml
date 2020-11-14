@@ -30,9 +30,28 @@
           name: Slope
         - entity: binary_sensor.sonoff_4ch_button_4
           name: Water Status
-    - type: light
-      entity: light.sonoff_4ch_blue_led
+
+- type: vertical-stack
+  cards:
     - type: entities
+      show_header_toggle: false
       entities:
         - entity: switch.sonoff_power_on_off
-
+        - entity: input_boolean.skip_watering
+        - entity: input_boolean.turn_off_watering
+    - type: history-graph
+      entities:
+        - entity: switch.sonoff_4ch_relay_1
+          name: Top Flat
+        - entity: switch.sonoff_4ch_relay_2
+          name: Raised Bed
+        - entity: switch.sonoff_4ch_relay_3
+          name: Slope
+        - entity: switch.sonoff_4ch_relay_4
+          name: Street
+        - entity: input_boolean.skip_watering
+          name: Skip Watering
+        - entity: input_boolean.turn_off_watering
+          name: Water Off
+    - type: light
+      entity: light.sonoff_4ch_blue_led

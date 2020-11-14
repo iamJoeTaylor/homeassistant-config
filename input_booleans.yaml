@@ -1,3 +1,11 @@
 vacation_mode:
   name: Vacation Mode
   icon: mdi:beach
+
+skip_watering:
+  name: Skip Watering
+  icon: mdi:water-minus-outline
+
+turn_off_watering:
+  name: Turn Off Watering
+  icon: mdi:water-off-outline
