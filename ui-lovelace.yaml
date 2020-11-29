@@ -57,11 +57,11 @@ views:
     cards: !include ui/yard.yaml
 
   - panel: false
-    icon: 'mdi:beach'
-    path: vacation
+    icon: 'mdi:file-cog-outline'
+    path: configuration
     theme: Google Dark Theme
     title: Vacation Mode
-    cards: !include ui/vacation.yaml
+    cards: !include ui/configuration.yaml
 
 
   - panel: true

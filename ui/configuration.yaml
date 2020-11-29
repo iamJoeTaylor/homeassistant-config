@@ -1,0 +1,18 @@
+- type: entities
+  entities:
+    - entity: input_boolean.vacation_mode
+
+- type: markdown
+  content: >-
+      | **Device** | **Battery Level** |
+
+      |:---|---:|
+
+      {%- for dev in states.sensor | selectattr('attributes.device_class',
+      'equalto', 'battery') | sort(attribute='state') %}
+        {%- set level = dev.state | int(default=-1) %}
+        {%- if level >= 0 and level < 40 %}
+          |{{ dev.name }}|{{ dev.state_with_unit }}|
+        {%- endif %}
+      {%- endfor %}
+  title: Low Battery

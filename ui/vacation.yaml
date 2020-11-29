@@ -1,4 +1,0 @@
-- type: entities
-  entities:
-    - entity: input_boolean.vacation_mode
-
