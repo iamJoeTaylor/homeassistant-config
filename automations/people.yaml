@@ -26,10 +26,10 @@
         entity_id: sun.sun
         state: 'below_horizon'
       - condition: state
-        entity_id: light.living_room
+        entity_id: light.living_room_hue
         state: 'off'
   action:
-    entity_id: light.living_room
+    entity_id: light.living_room_hue
     service: light.turn_on
     data:
       brightness: 80
@@ -46,10 +46,10 @@
         entity_id: sun.sun
         state: 'below_horizon'
       - condition: state
-        entity_id: light.living_room
+        entity_id: light.living_room_hue
         state: 'off'
   action:
-    entity_id: light.living_room
+    entity_id: light.living_room_hue
     service: light.turn_on
     data:
       brightness: 80

@@ -9,3 +9,11 @@ skip_watering:
 turn_off_watering:
   name: Turn Off Watering
   icon: mdi:water-off-outline
+
+bedroom_heat:
+  name: 'Bedroom Heat'
+  initial: off
+
+bella_heat:
+  name: 'Bella Heat'
+  initial: off

@@ -1,0 +1,20 @@
+- platform: group
+  name: Living Room Hue
+  entities:
+    - light.hue_tripod
+    - light.hue_downlight_left
+    - light.hue_downlight_left_middle
+    - light.hue_downlight_right
+    - light.hue_downlight_right_middle
+
+- platform: group
+  name: Hall Hue
+  entities:
+    - light.hue_hall_1
+    - light.hue_hall_2
+
+- platform: group
+  name: Bella Hue
+  entities:
+    - light.hue_bella_left
+    - light.hue_bella_right

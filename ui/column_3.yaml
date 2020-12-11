@@ -38,24 +38,24 @@
 
 - show_header_toggle: false
   entities:
-    - entity: light.living_room
+    - entity: light.living_room_hue
       hide_when_off: true
       name: Living room
       toggle: true
       type: 'custom:slider-entity-row'
-    - entity: light.living_room
+    - entity: light.living_room_hue
       hide_when_off: true
       toggle: false
       full_row: true
       hide_state: true
       attribute: color_temp
       type: 'custom:slider-entity-row'
-    - entity: light.hall
+    - entity: light.hall_hue
       hide_when_off: true
       name: Hall
       toggle: true
       type: 'custom:slider-entity-row'
-    - entity: light.hall
+    - entity: light.hall_hue
       hide_when_off: true
       toggle: false
       full_row: true
@@ -68,9 +68,9 @@
 
 - type: conditional
   conditions:
-    - entity: light.living_room
+    - entity: light.living_room_hue
       state: "on"
-    - entity: light.hall
+    - entity: light.hall_hue
       state: "on"
   card:
     type: button
@@ -83,9 +83,9 @@
 
 - type: conditional
   conditions:
-    - entity: light.living_room
+    - entity: light.living_room_hue
       state: "off"
-    - entity: light.hall
+    - entity: light.hall_hue
       state: "off"
   card:
     type: button

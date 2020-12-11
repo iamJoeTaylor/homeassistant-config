@@ -1,0 +1,105 @@
+- type: horizontal-stack
+  cards:
+    - control:
+        hvac:
+          fan_only: false
+          cool: false
+          heat_cool: false
+          auto: false
+          dry: false
+          heat: true
+          'off': true
+      entity: climate.zen_thermostat
+      hide:
+        temperature: true
+      name: false
+      fallback: 00.0
+      step_size: 1
+      style: |
+        ha-card {
+          --st-mode-background: var(--paper-card-background-color);
+          --st-mode-active-background: var(--paper-card-background-color);
+          --sidebar-selected-icon-color: var(--accent-color);
+          --st-spacing: 4px;
+          --st-font-size-m: 15px
+          --st-font-size-xl: 40px;
+          }
+      type: 'custom:simple-thermostat'
+    - type: history-graph
+      title: 'Heater History'
+      entities:
+        - climate.zen_thermostat
+        - sensor.dyson_temperature
+        - sensor.master_room_temperature
+        - sensor.bella_room_temperature
+        - sensor.dining_room_temperature
+
+
+- type: horizontal-stack
+  cards:
+    - type: vertical-stack
+      cards:
+        - type: entities
+          title: Living Room
+          entities:
+            - cover.vent_living_room_level
+            - sensor.vent_living_room_temperature
+        - entities:
+            - entity: sensor.dyson_temperature
+              name: Living Room
+              show_legend: false
+            - entity: sensor.vent_living_room_temperature
+              name: Living Room vent
+              show_legend: false
+          font_size: 75
+          line_color: '#e74c3c'
+          line_width: 2
+          name: Living Room Temp
+          type: 'custom:mini-graph-card'
+
+    - type: vertical-stack
+      cards:
+        - entity: climate.bedroom
+          name: Bedroom
+          type: thermostat
+        - type: entities
+          title: Bedroom
+          entities:
+            - cover.vent_bedroom_level
+            - sensor.vent_bedroom_temp
+        - entities:
+            - entity: sensor.master_room_temperature
+              name: Bedroom Room
+              show_legend: false
+            - entity: sensor.vent_bedroom_temp
+              name: Bedroom vent
+              show_legend: false
+          font_size: 75
+          line_color: '#e74c3c'
+          line_width: 2
+          name: Bedroom Temp
+          type: 'custom:mini-graph-card'
+
+    - type: vertical-stack
+      cards:
+        - entity: climate.bedroom
+          name: Bedroom
+          type: thermostat
+        - type: entities
+          title: Bella Room
+          entities:
+            - cover.vent_bella_level
+            - sensor.vent_bella_temperature
+
+        - entities:
+            - entity: sensor.bella_room_temperature
+              name: bella's room
+              show_legend: false
+            - entity: sensor.vent_bella_temperature
+              name: bella's room vent
+              show_legend: false
+          font_size: 75
+          line_color: '#e74c3c'
+          line_width: 2
+          name: Bella Room Temp
+          type: 'custom:mini-graph-card'

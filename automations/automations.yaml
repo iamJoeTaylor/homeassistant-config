@@ -61,7 +61,7 @@
     - platform: time
       at: '19:00:00'
   action:
-    entity_id: light.porch_2
+    entity_id: light.hue_porch
     service: light.turn_on
     data:
       brightness: 10
@@ -71,7 +71,7 @@
   - platform: time
     at: '00:00:00'
   action:
-    entity_id: light.porch_2
+    entity_id: light.hue_porch
     service: light.turn_off
 
 - alias: Water Frontyard Morning

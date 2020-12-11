@@ -150,21 +150,12 @@ ios:
 conversation:
 
 homekit:
-  auto_start: false
 
 ## Section: Component configuration
 
 group: !include groups.yaml
 
-light:
-  - platform: group
-    name: Living Room Lights
-    entities:
-      - light.living_room_left
-      - light.living_room_middle_left
-      - light.living_room_middle_right
-      - light.living_room_right
-      - light.tripod_lamp
+light: !include light.yaml
 
 # tuya:
 #   username: !secret tuya_un
@@ -198,12 +189,45 @@ switch:
   - platform: circadian_lighting
     name: Lights Circadian
     lights_ct:
-      - light.living_room
-      - light.hall
+      - light.living_room_hue
+      - light.hall_hue
     lights_brightness:
-      - light.living_room
-      - light.hall
+      - light.living_room_hue
+      - light.hall_hue
     min_brightness: 20
     max_brightness: 100
 
+  - platform: template
+    switches:
+      bedroom_heat:
+        value_template: "{{ is_state('input_boolean.bedroom_heat', 'on') }}"
+        turn_on:
+          service: script.heat_on
+          data:
+            input_to_change: input_boolean.bedroom_heat
+        turn_off:
+          service: script.heat_off
+          data:
+            input_to_change: input_boolean.bedroom_heat
+  - platform: template
+    switches:
+      bella_heat:
+        value_template: "{{ is_state('input_boolean.bella_heat', 'on') }}"
+        turn_on:
+          service: script.heat_on
+          data:
+            input_to_change: input_boolean.bella_heat
+        turn_off:
+          service: script.heat_off
+          data:
+            input_to_change: input_boolean.bella_heat
 
+climate:
+  - platform: generic_thermostat
+    name: Bedroom
+    heater: switch.bedroom_heat
+    target_sensor: sensor.master_room_temperature
+  - platform: generic_thermostat
+    name: Bedroom
+    heater: switch.bella_heat
+    target_sensor: sensor.bella_room_temperature

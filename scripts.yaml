@@ -1,9 +1,110 @@
+heat_on:
+  # If is in Zoned Heating time (triggered by timed automations)
+  # Check all Room Climates
+  # If Climate input_boolean is on
+  # Open Vent otherwise close vent
+  # Turn on Zen Heater
+  sequence:
+    # - condition: time
+    #   after: '17:30:00'
+    #   before: '08:00:00'
+    - service: input_boolean.turn_on
+      data_template:
+        entity_id: "{{input_to_change}}"
+    - service: script.set_vent
+      data_template:
+        is_open: >
+          {{is_state('input_boolean.bedroom_heat', 'on')}}
+        entity: "cover.vent_bedroom_level"
+    - service: script.set_vent
+      data_template:
+        is_open: >
+          {{is_state('input_boolean.bella_heat', 'on')}}
+        entity: "cover.vent_bella_level"
+
+    - service: script.set_vent
+      data:
+        is_open: false
+        entity: "cover.vent_living_room_level"
+    - service: climate.set_temperature
+      entity_id: climate.zen_thermostat
+      data:
+        temperature: 75
+        hvac_mode: heat
+
+heat_off:
+  # If is in Zoned Heating (triggered by timed automations)
+  # Check all Room Climates
+  # If Climate input_boolean is on
+  # Open Vent otherwise close vent
+  # if no zones are heating
+  # Turn off Zen Heater
+  sequence:
+    - service: input_boolean.turn_off
+      data_template:
+        entity_id: "{{input_to_change}}"
+    - service: script.set_vent
+      data_template:
+        is_open: >
+          {{is_state('input_boolean.bedroom_heat', 'on')}}
+        entity: "cover.vent_bedroom_level"
+    - service: script.set_vent
+      data_template:
+        is_open: >
+          {{is_state('input_boolean.bella_heat', 'on')}}
+        entity: "cover.vent_bella_level"
+    - choose:
+      - conditions:
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: input_boolean.bedroom_heat
+              state: 'on'
+            - condition: state
+              entity_id: input_boolean.bella_heat
+              state: 'on'
+        sequence:
+          - service: climate.set_temperature
+            entity_id: climate.zen_thermostat
+            data:
+              temperature: 75
+              hvac_mode: heat
+      default:
+        - service: climate.set_temperature
+          entity_id: climate.zen_thermostat
+          data:
+            temperature: 55
+            hvac_mode: heat
+        - service: script.set_vent
+          data:
+            is_open: true
+            entity: "cover.vent_living_room_level"
+
+
+set_vent:
+  sequence:
+    - choose:
+      - conditions: >
+          {{ is_open }}
+        sequence:
+          - service: cover.set_cover_position
+            data_template:
+              entity_id: "{{entity}}"
+              position: 100
+      default:
+        - service: cover.set_cover_position
+          data_template:
+            entity_id: "{{entity}}"
+            position: 0
+
 sleep:
   sequence:
+    - service: switch.turn_off
+      entity_id: switch.circadian_lighting_lights_circadian
     - service: light.turn_off
-      entity_id: light.living_room
+      entity_id: light.living_room_hue
     - service: light.turn_off
-      entity_id: light.hall
+      entity_id: light.hall_hue
     - service: media_player.turn_off
       entity_id: media_player.samsung_un60d8000
     - service: switch.turn_off
@@ -15,21 +116,16 @@ sleep:
 
 wakeup:
   sequence:
+    - service: switch.turn_on
+      entity_id: switch.circadian_lighting_lights_circadian
     - service: light.turn_on
-      entity_id: light.living_room
+      entity_id: light.living_room_hue
     - service: light.turn_on
-      entity_id: light.hall
+      entity_id: light.hall_hue
     - service: switch.turn_on
       entity_id: group.power_bar
     - service: switch.turn_on
       entity_id: switch.fountain_plug_on_off
-
-set_hue_scene:
-  sequence:
-    - service: hue.hue_activate_scene
-      data_template:
-        group_name: "{{ group }}"
-        scene_name: "{{ scene }}"
 
 sprinkler_water_front:
   alias: "Sprinkler Water Frontyard"

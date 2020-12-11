@@ -1,10 +1,3 @@
-custom_header:
-  active_tab_color: var(--state-icon-active-color)
-  background: var(--app-header-background-color)
-  compact_mode: true
-  elements_color: var(--app-header-text-color)
-  tab_indicator_color: var(--state-icon-active-color)
-
 title: Home
 views:
   - panel: true
@@ -72,3 +65,11 @@ views:
     cards:
       - type: 'custom:zha-network-visualization-card'
 
+  - panel: true
+    icon: 'mdi:texture-box'
+    path: heat
+    theme: Google Dark Theme
+    title: Heater Control
+    cards:
+      - type: vertical-stack
+        cards: !include ui/heater.yaml
