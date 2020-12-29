@@ -18,3 +18,7 @@
   entities:
     - light.hue_bella_left
     - light.hue_bella_right
+
+- platform: nanoleaf
+  host: !secret nanoleaf_bella_ip
+  token: !secret nanoleaf_bella

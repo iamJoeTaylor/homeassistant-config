@@ -21,14 +21,11 @@ homeassistant:
 
 http:
 cloud:
-airvisual:
-  api_key: !secret airvisual_api_key
-  geographies:
-      city: Berkeley
-      state: California
-      country: USA
 
-automation: !include_dir_merge_list automations/
+# UI based automations
+automation: !include automations.yaml
+automation custom: !include_dir_merge_list automations/
+
 script: !include scripts.yaml
 scene: !include scenes.yaml
 input_boolean: !include input_booleans.yaml
@@ -36,8 +33,6 @@ input_boolean: !include input_booleans.yaml
 lovelace:
   mode: yaml
   resources:
-    - type: module
-      url: /hacsfiles/custom-header/custom-header.js
     - type: module
       url: /hacsfiles/button-card/button-card.js
     - type: module
@@ -52,8 +47,6 @@ lovelace:
       url: /hacsfiles/lovelace-slider-entity-row/slider-entity-row.js
     - type: module
       url: /hacsfiles/simple-thermostat/simple-thermostat.js
-    - type: module
-      url: /hacsfiles/button-toolbar/button-toolbar.js
     - type: module
       url: /hacsfiles/zha-network-card/zha-network-card.js
     - type: module
@@ -228,6 +221,6 @@ climate:
     heater: switch.bedroom_heat
     target_sensor: sensor.master_room_temperature
   - platform: generic_thermostat
-    name: Bedroom
+    name: Bella Room
     heater: switch.bella_heat
     target_sensor: sensor.bella_room_temperature

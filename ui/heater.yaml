@@ -82,8 +82,8 @@
 
     - type: vertical-stack
       cards:
-        - entity: climate.bedroom
-          name: Bedroom
+        - entity: climate.bella_room
+          name: Bella Bedroom
           type: thermostat
         - type: entities
           title: Bella Room
