@@ -1,0 +1,250 @@
+custom_header:
+  active_tab_color: var(--state-icon-active-color)
+  background: var(--app-header-background-color)
+  compact_mode: true
+  elements_color: var(--app-header-text-color)
+  tab_indicator_color: var(--state-icon-active-color)
+
+title: Home
+views:
+  - badges:
+      - entity: person.joe
+      - entity: person.kim
+    cards:
+      - cards:
+          - entities:
+              - entity: sensor.dyson_humidity
+                index: 0
+            font_size: 75
+            icon: 'mdi:water-percent'
+            line_color: var(--accent-color)
+            line_width: 8
+            name: Humidity
+            type: 'custom:mini-graph-card'
+          - entities:
+              - entity: sensor.dyson_temperature
+                index: 0
+            font_size: 75
+            line_color: '#e74c3c'
+            line_width: 8
+            name: Temp
+            type: 'custom:mini-graph-card'
+          - entities:
+              - entity: sensor.dyson_aqi
+                index: 0
+            font_size: 75
+            icon: 'mdi:chart-line'
+            line_color: green
+            line_width: 8
+            name: AQI
+            type: 'custom:mini-graph-card'
+        type: horizontal-stack
+      - cards:
+          - entities:
+              - entity: sensor.steps
+                index: 0
+            font_size: 75
+            line_color: var(--accent-color)
+            line_width: 8
+            name: Joe's Steps
+            type: 'custom:mini-graph-card'
+          - entities:
+              - entity: sensor.steps_3
+                index: 0
+            font_size: 75
+            line_color: '#e74c3c'
+            line_width: 8
+            name: Kim's Steps
+            type: 'custom:mini-graph-card'
+          - entities:
+              - entity: sensor.u_s_air_quality_index
+                index: 0
+            font_size: 75
+            line_color: green
+            line_width: 8
+            name: AQI
+            type: 'custom:mini-graph-card'
+        type: horizontal-stack
+      - control:
+          hvac:
+            fan_only: false
+            cool: false
+            heat_cool: false
+            auto: false
+            dry: false
+            heat: true
+            'off': true
+        entity: climate.zen_thermostat
+        hide:
+          temperature: true
+        name: false
+        fallback: 00.0
+        step_size: 1
+        style: |
+          ha-card {
+            --st-mode-background: var(--paper-card-background-color);
+            --st-mode-active-background: var(--paper-card-background-color);
+            --sidebar-selected-icon-color: var(--accent-color);
+            --st-spacing: 4px;
+            --st-font-size-m: 15px
+            --st-font-size-xl: 40px;
+            }
+        type: 'custom:simple-thermostat'
+      - type: entities
+        entities:
+          - entity: fan.living_room
+            hide_when_off: true
+            name: Dyson
+            toggle: true
+            type: 'custom:slider-entity-row'
+          - type: 'custom:button-toolbar-redux'
+            style: |
+              ha-card {
+                --bt-toolbar-background: var(--paper-card-background-color);
+                --bt-icon-active-color: var(--accent-color)
+                }
+            toolbar:
+              - type: service
+                name: Toggle
+                icon: mdi:refresh
+                service:
+                  name: fan.oscillate
+                  entity: fan.living_room
+                  parameter: oscillating
+                  toggle: true
+              - type: service
+                name: Auto
+                icon: mdi:auto-fix
+                service:
+                  name: fan.set_speed
+                  entity: fan.living_room
+                  parameter: speed
+                  active: AUTO
+                  args:
+                    speed: AUTO
+              - type: service
+                name: Toggle
+                icon: mdi:weather-night
+                service:
+                  name: dyson.set_night_mode
+                  entity: fan.living_room
+                  parameter: night_mode
+                  toggle: true
+      - cards:
+          - entities:
+              - entity: sensor.pi_temperature
+                index: 0
+            font_size: 75
+            hours_to_show: 3
+            line_color: green
+            line_width: 8
+            name: Temp
+            points_per_hour: 10
+            symbol: Mb/s
+            type: 'custom:mini-graph-card'
+          - entities:
+              - entity: sensor.processor_use
+                index: 0
+            font_size: 75
+            hours_to_show: 3
+            line_color: orange
+            line_width: 8
+            name: CPU
+            points_per_hour: 10
+            type: 'custom:mini-graph-card'
+        type: horizontal-stack
+      - entities:
+          - entity: light.living_room
+            hide_when_off: true
+            name: Living room
+            toggle: true
+            type: 'custom:slider-entity-row'
+          - entity: light.living_room
+            hide_when_off: true
+            toggle: false
+            full_row: true
+            hide_state: true
+            attribute: color_temp
+            type: 'custom:slider-entity-row'
+          - colors:
+              - brightness: 0
+                icon_color: '#222'
+              - brightness: 128
+                icon_color: '#ff8'
+              - brightness: 255
+                icon_color: '#ffa'
+              - color_temp: 160
+                icon_color: '#ffead9'
+              - color_temp: 350
+                icon_color: '#ffa859'
+              - color_temp: 550
+                icon_color: '#ff8000'
+            entity: light.living_room
+            justify: between
+            size: 36
+            type: 'custom:rgb-light-card'
+          - entity: light.hall
+            hide_when_off: true
+            name: Hall
+            toggle: true
+            type: 'custom:slider-entity-row'
+          - entity: light.hall
+            hide_when_off: true
+            toggle: false
+            full_row: true
+            hide_state: true
+            attribute: hue
+            type: 'custom:slider-entity-row'
+          - colors:
+              - brightness: 0
+                icon_color: '#222'
+              - rgb_color:
+                  - 241
+                  - 224
+                  - 181
+              - rgb_color:
+                  - 239
+                  - 210
+                  - 117
+              - rgb_color:
+                  - 245
+                  - 250
+                  - 246
+              - icon_color: '#D72AE0'
+                rgb_color:
+                  - 255
+                  - 127
+                  - 255
+              - icon_color: '#E02A2A'
+                rgb_color:
+                  - 255
+                  - 0
+                  - 0
+            entity: light.hall
+            justify: between
+            size: 36
+            type: 'custom:rgb-light-card'
+        type: entities
+      - type: entities
+        entities:
+          - binary_sensor.lumi_lumi_vibration_aq1_03d4806c_1_1280
+      - type: entities
+        entities:
+          - entity: binary_sensor.front_door_status_sensor
+          - entity: binary_sensor.back_door_status_sensor
+          - entity: binary_sensor.studio_door_status_sensor
+      - type: entities
+        entities:
+          - group.power_bar
+          - switch.power_computer
+      - type: entities
+        entities:
+          - entity: device_tracker.joe_tracker_presence
+          - entity: device_tracker.kim_tracker_presence
+        show_header_toggle: false
+        title: Home
+    icon: 'mdi:home'
+    path: home
+    theme: Google Dark Theme
+    title: New Home
+

@@ -1,0 +1,69 @@
+- alias: Notify if sprinklers left on for 30 minutes
+  id: c72b1caa51424d049a2f144c1160d7c7
+  trigger:
+  - platform: state
+    entity_id:
+    - switch.sonoff_4ch_relay_1
+    - switch.sonoff_4ch_relay_2
+    - switch.sonoff_4ch_relay_3
+    - switch.sonoff_4ch_relay_4
+    to: 'on'
+    for:
+      minutes: 5
+  action:
+  - service: notify.mobile_app_joes_iphone
+    data:
+      message: Sprinkler has been running for > 30 min
+      data:
+        push:
+          sound:
+            name: default
+            critical: 1
+            volume: 1.0
+- alias: Water Frontyard
+  id: d3b9ce0c8a7f4527b200174e076f9213
+  trigger:
+  - platform: time
+    at: 66300
+  action:
+  - service: script.sprinkler_water_front
+- id: '1606869824981'
+  alias: Turn on the studio light if there is studio occupancy
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.studio_motion_occupancy
+    from: 'off'
+    to: 'on'
+  condition: []
+  action:
+  - domain: light
+    entity_id: light.hue_studio
+    device_id: 91ef4b4f1004dc93c47b98769feeaef0
+    type: turn_on
+    brightness_pct: 100
+  mode: single
+- id: '1609198433337'
+  alias: Washer/Dryer has finished
+  description: ''
+  use_blueprint:
+    path: sbyx/notify-or-do-something-when-an-appliance-like-a-dishwasher-or-washing-machine-finishes.yaml
+    input:
+      finishing_hysteresis: '5'
+      power_sensor: sensor.lumi_lumi_plug_maus01_electrical_measurement
+      actions:
+      - service: notify.mobile_app_joes_iphone
+        data:
+          title: Washer or Dryer has finished
+          message: love HA
+      - service: notify.mobile_app_meow
+        data:
+          title: Washer or Dryer has finished
+          message: love HA
+      - service: notify.alexa_media_jarvis
+        data:
+          data:
+            type: tts
+          message: Washer or Dryer has finished
+      finishing_threshold: '5'
+      starting_hysteresis: '5'
