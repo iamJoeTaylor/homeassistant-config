@@ -2,6 +2,7 @@
 !*.yaml
 !automations
 !automations/*
+automations.yaml
 !ui
 !ui/*
 !scenes

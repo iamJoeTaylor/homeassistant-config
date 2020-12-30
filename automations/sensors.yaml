@@ -59,32 +59,6 @@
     - service: switch.turn_off
       entity_id: switch.kitchen_plug_right
 
-
-- alias: Studio light on
-  description: ''
-  trigger:
-    platform: state
-    entity_id: binary_sensor.studio_motion_occupancy
-    to: 'on'
-  condition: []
-  action:
-    - service: light.turn_on
-      entity_id: light.hue_studio
-      data_template:
-        brightness_pct: 100
-
-- alias: Studio light off
-  description: ''
-  trigger:
-    platform: state
-    entity_id: binary_sensor.studio_motion_occupancy
-    to: 'off'
-  condition: []
-  action:
-    - service: light.turn_off
-      entity_id: light.hue_studio
-
-
 - alias: Bella light on
   description: ''
   trigger:
