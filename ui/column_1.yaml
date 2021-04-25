@@ -13,7 +13,7 @@
           name: Bella's Room
           show_legend: false
           color: '#EE735F'
-        - entity: sensor.master_room_temperature
+        - entity: sensor.bedroom_temperature
           name: Bedroom Room
           show_legend: false
           color: '#EC6653'
@@ -46,7 +46,7 @@
           name: Living Room
           show_legend: false
           color: '#66C1E2'
-        - entity: sensor.master_room_humidity
+        - entity: sensor.bedroom_humidity
           name: Bedroom Room
           show_legend: false
           color: '#46AEDD'

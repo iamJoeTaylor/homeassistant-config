@@ -70,8 +70,6 @@
   conditions:
     - entity: light.living_room_hue
       state: "on"
-    - entity: light.hall_hue
-      state: "on"
   card:
     type: button
     name: Sleep
@@ -85,8 +83,6 @@
   conditions:
     - entity: light.living_room_hue
       state: "off"
-    - entity: light.hall_hue
-      state: "off"
   card:
     type: button
     name: Wake up
@@ -94,4 +90,7 @@
     tap_action:
       action: call-service
       service: script.wakeup
+    hold_action:
+      action: call-service
+      service: script.toggle_night_light
     icon: mdi:weather-sunset

@@ -14,11 +14,36 @@
     - light.hue_hall_2
 
 - platform: group
+  name: Studio Bench
+  entities:
+    - light.hue_studio_lamp
+    - light.canvas
+
+- platform: group
+  name: Studio Rail One
+  entities:
+    - light.hue_studio_rail_1_1
+    - light.hue_studio_rail_1_2
+    - light.hue_studio_rail_1_3
+
+- platform: group
+  name: Studio Lights
+  entities:
+    - light.studio_rail_one
+    - light.studio_bench
+
+- platform: group
   name: Bella Hue
   entities:
     - light.hue_bella_left
     - light.hue_bella_right
 
 - platform: nanoleaf
+  name: nanoleaf
   host: !secret nanoleaf_bella_ip
   token: !secret nanoleaf_bella
+
+- platform: nanoleaf
+  name: canvas
+  host: !secret nanoleaf_studio_ip
+  token: !secret nanoleaf_studio

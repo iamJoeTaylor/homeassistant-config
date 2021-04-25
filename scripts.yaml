@@ -127,6 +127,16 @@ wakeup:
     - service: switch.turn_on
       entity_id: switch.fountain_plug_on_off
 
+toggle_night_light:
+  sequence:
+    - service: switch.turn_off
+      entity_id: switch.circadian_lighting_lights_circadian
+    - service: light.toggle
+      entity_id: light.hue_tripod
+      data:
+        brightness_pct: 45
+        color_temp: 400
+
 sprinkler_water_front:
   alias: "Sprinkler Water Frontyard"
   sequence:
@@ -149,24 +159,24 @@ sprinkler_water_front:
     - delay: '00:01'
     - service: switch.turn_on
       entity_id: switch.sonoff_4ch_relay_1
-    - delay: '00:10'
+    - delay: '00:08'
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_1
     - delay: '00:01'
     - service: switch.turn_on
       entity_id: switch.sonoff_4ch_relay_2
-    - delay: '00:10'
+    - delay: '00:08'
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_2
     - delay: '00:01'
     - service: switch.turn_on
       entity_id: switch.sonoff_4ch_relay_3
-    - delay: '00:10'
+    - delay: '00:08'
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_3
     - delay: '00:01'
     - service: switch.turn_on
       entity_id: switch.sonoff_4ch_relay_4
-    - delay: '00:10'
+    - delay: '00:08'
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_4

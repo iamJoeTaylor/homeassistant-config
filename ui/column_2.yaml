@@ -65,3 +65,9 @@
 
 - type: weather-forecast
   entity: weather.home
+
+- type: entities
+  show_header_toggle: false
+  entities:
+    - entity: sensor.sprinkler_status
+

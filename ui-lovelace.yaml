@@ -73,3 +73,10 @@ views:
     cards:
       - type: vertical-stack
         cards: !include ui/heater.yaml
+
+  - panel: false
+    icon: 'mdi:warehouse'
+    path: studio
+    theme: Google Dark Theme
+    title: Studio
+    cards: !include ui/studio.yaml

@@ -125,7 +125,7 @@
         {% endif %}
 
         {% if switch_last_changed is defined %}
-          {% set run_time = (15 * 60) %}
+          {% set run_time = (7 * 60) %}
           {% set time = run_time - (as_timestamp(now()) - as_timestamp(switch_last_changed)) %}
           {% set minutes = ((time % 3600) / 60) | int %}
           {% set hours = ((time % 86400) / 3600) | int %}
@@ -236,4 +236,11 @@
            {{date_at("4", tomorrow) }}
         {% endif %}
 
-
+- platform: template
+  sensors:
+    canvas_entity_list:
+      value_template: "{{state_attr('light.canvas', 'effect_list')|join(',')}}"
+- platform: template
+  sensors:
+    nanoleaf_entity_list:
+      value_template: "{{state_attr('light.nanoleaf', 'effect_list')|join(',')}}"

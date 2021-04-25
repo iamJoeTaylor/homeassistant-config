@@ -59,10 +59,6 @@
     platform: state
     entity_id: binary_sensor.front_door
     to: 'on'
-  condition:
-    - condition: state
-      entity_id: device_tracker.joe_tracker_presence
-      state: 'Home'
   action:
     - service: notify.alexa_media_jarvis
       data:

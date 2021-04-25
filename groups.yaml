@@ -1,4 +1,4 @@
 power_bar:
   name: Power Bar
   entities:
-    - switch.power_tetris
+    - switch.led_strip

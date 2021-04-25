@@ -1,0 +1,23 @@
+- type: vertical-stack
+  cards:
+    - type: entities
+      show_header_toggle: false
+      entities:
+        - entity: binary_sensor.studio_door_status_sensor
+        - entity: light.studio_lights
+          icon: 'mdi:track-light'
+        - entity: light.flood_light
+          icon: 'mdi:track-light'
+        - entity: light.hue_studio_lamp
+        - entity: light.canvas
+        - entity: switch.studio_heater_plug_on_off
+
+- type: vertical-stack
+  cards:
+    - type: entities
+      entities:
+        - switch.studio_washer_plug
+        - sensor.studio_washer_plug_electrical
+        - sensor.studio_washer_plug_analog
+        - sensor.studio_washer_plug_analog_2
+

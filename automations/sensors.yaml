@@ -69,25 +69,13 @@
     - condition: time
       after: '09:00'
       before: '21:00'
-    - condition: device
-      type: is_off
-      device_id: b1ad9840a2704ec42272b50ca38cdfd8
-      entity_id: light.hue_bella_left
-      domain: light
-    - condition: device
-      type: is_off
-      device_id: 1f5236bf1e2443d3d192a51c2dc9a5f2
-      entity_id: light.hue_bella_right
-      domain: light
   action:
     - service: light.turn_on
       entity_id: light.hue_bella_left
-      data_template:
-        brightness_pct: 100
     - service: light.turn_on
       entity_id: light.hue_bella_right
-      data_template:
-        brightness_pct: 100
+    - service: light.turn_on
+      entity_id: light.nanoleaf
   mode: single
 
 - alias: Bella light off
@@ -100,89 +88,12 @@
     - condition: time
       after: '09:00'
       before: '21:00'
-    - condition: device
-      type: is_on
-      device_id: b1ad9840a2704ec42272b50ca38cdfd8
-      entity_id: light.hue_bella_left
-      domain: light
-    - condition: device
-      type: is_on
-      device_id: 1f5236bf1e2443d3d192a51c2dc9a5f2
-      entity_id: light.hue_bella_right
-      domain: light
   action:
     - service: light.turn_off
       entity_id: light.hue_bella_left
     - service: light.turn_off
       entity_id: light.hue_bella_right
+    - service: light.turn_off
+      entity_id: light.nanoleaf
   mode: single
 
-- alias: Ikea Button On
-  description: ''
-  trigger:
-  - device_id: 911eb9a08fa948d49d178ad32f18bbaf
-    domain: zha
-    platform: device
-    subtype: turn_on
-    type: remote_button_short_press
-  condition: []
-  action:
-    - service: light.turn_on
-      entity_id: light.bella_hue
-      data_template:
-        color_temp: 370
-
-- alias: Ikea Button Off
-  description: ''
-  trigger:
-  - device_id: 911eb9a08fa948d49d178ad32f18bbaf
-    domain: zha
-    platform: device
-    subtype: turn_on
-    type: remote_button_short_press
-  condition:
-  - condition: state
-    entity_id: light.bella_hue
-    state: 'on'
-  action:
-  - entity_id: light.bella_hue
-    service: light.turn_off
-
-- alias: Ikea Dim up
-  description: ''
-  trigger:
-  - device_id: 911eb9a08fa948d49d178ad32f18bbaf
-    domain: zha
-    platform: device
-    subtype: dim_up
-    type: remote_button_short_press
-  condition: []
-  action:
-   - service: scene.turn_on
-     data_template:
-      transition: 2.5
-      entity_id: >
-        scene.{{ ['Arctic aurora', 'Savanna sunset', 'Tropical twilight'] | random  }}
-
-- alias: Ikea Dim down
-  description: ''
-  trigger:
-  - device_id: 911eb9a08fa948d49d178ad32f18bbaf
-    domain: zha
-    platform: device
-    subtype: dim_down
-    type: remote_button_short_press
-  condition: []
-  action:
-    - service: light.turn_on
-      data_template:
-        entity_id:
-          - light.hue_bella_left
-        transition: 2.5
-        rgb_color: ['{{ (range(0, 255)|random) }}', '{{ (range(0, 255)|random) }}', '{{ (range(0, 255)|random) }}']
-    - service: light.turn_on
-      data_template:
-        entity_id:
-          - light.hue_bella_right
-        transition: 2.5
-        rgb_color: ['{{ (range(0, 255)|random) }}', '{{ (range(0, 255)|random) }}', '{{ (range(0, 255)|random) }}']
