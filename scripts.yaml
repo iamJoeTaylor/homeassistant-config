@@ -1,3 +1,71 @@
+neopixel_play:
+  sequence:
+    - repeat:
+        while:
+          - condition: device
+            type: is_on
+            device_id: 6aed32ee9d50576fd0d8d98cc9e0b6fb
+            entity_id: light.joe_neopixel_panel_light
+            domain: light
+        sequence:
+          - service: script.neopixel_up
+          - delay:
+              minutes: 3
+  mode: single
+
+neopixel_random:
+  sequence:
+    - service: light.turn_on
+      target:
+        entity_id: light.joe_neopixel_panel_light
+      data:
+        effect: "{{states('sensor.neopixel_panel_effect_list').split(',') | random}}"
+
+
+neopixel_down:
+  sequence:
+    - choose:
+      - conditions: "{{(states('input_number.neopixel_effect_index')|int) == 1}}"
+        sequence:
+          - service: input_number.set_value
+            target:
+              entity_id: input_number.neopixel_effect_index
+            data:
+              value: "{{states('sensor.neopixel_panel_effect_list').split(',')|count}}"
+
+    - service: input_number.set_value
+      target:
+        entity_id: input_number.neopixel_effect_index
+      data:
+        value: "{{(states('input_number.neopixel_effect_index')|int) - 1}}"
+    - service: light.turn_on
+      target:
+        entity_id: light.joe_neopixel_panel_light
+      data:
+        effect: "{{states('sensor.neopixel_panel_effect_list').split(',')[states('input_number.neopixel_effect_index')|int]}}"
+
+neopixel_up:
+  sequence:
+    - choose:
+      - conditions: "{{(states('input_number.neopixel_effect_index')|int) == ((states('sensor.neopixel_panel_effect_list').split(',')|count) - 1)}}"
+        sequence:
+          - service: input_number.set_value
+            target:
+              entity_id: input_number.neopixel_effect_index
+            data:
+              value: 1
+      default:
+        - service: input_number.set_value
+          target:
+            entity_id: input_number.neopixel_effect_index
+          data:
+            value: "{{(states('input_number.neopixel_effect_index')|int) + 1}}"
+    - service: light.turn_on
+      target:
+        entity_id: light.joe_neopixel_panel_light
+      data:
+        effect: "{{states('sensor.neopixel_panel_effect_list').split(',')[states('input_number.neopixel_effect_index')|int]}}"
+
 heat_on:
   # If is in Zoned Heating time (triggered by timed automations)
   # Check all Room Climates

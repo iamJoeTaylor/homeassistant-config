@@ -244,3 +244,8 @@
   sensors:
     nanoleaf_entity_list:
       value_template: "{{state_attr('light.nanoleaf', 'effect_list')|join(',')}}"
+
+- platform: template
+  sensors:
+    neopixel_panel_effect_list:
+      value_template: "{{state_attr('light.joe_neopixel_panel_light', 'effect_list')|join(',')}}"

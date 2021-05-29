@@ -1,23 +1,56 @@
 - type: vertical-stack
   cards:
-    - type: entities
-      show_header_toggle: false
-      entities:
-        - entity: binary_sensor.studio_door_status_sensor
-        - entity: light.studio_lights
-          icon: 'mdi:track-light'
-        - entity: light.flood_light
-          icon: 'mdi:track-light'
-        - entity: light.hue_studio_lamp
-        - entity: light.canvas
-        - entity: switch.studio_heater_plug_on_off
+    - type: vertical-stack
+      cards:
+        - type: entities
+          show_header_toggle: false
+          entities:
+            - entity: binary_sensor.studio_door_status_sensor
+            - entity: light.studio_lights
+              icon: 'mdi:track-light'
+            - entity: light.flood_light
+              icon: 'mdi:track-light'
+            - entity: light.hue_studio_lamp
+            - entity: light.canvas
+            - entity: switch.studio_heater_plug_on_off
 
-- type: vertical-stack
-  cards:
-    - type: entities
-      entities:
-        - switch.studio_washer_plug
-        - sensor.studio_washer_plug_electrical
-        - sensor.studio_washer_plug_analog
-        - sensor.studio_washer_plug_analog_2
+    - type: vertical-stack
+      cards:
+        - type: entities
+          entities:
+            - switch.studio_washer_plug
+            - sensor.studio_washer_plug_electrical
+            - sensor.studio_washer_plug_analog
+            - sensor.studio_washer_plug_analog_2
 
+
+    - type: vertical-stack
+      cards:
+        - entity: light.joe_neopixel_panel_light
+          hide_when_off: true
+          name: Neopixel Panel
+          toggle: true
+          attribute: effect
+          type: 'custom:slider-entity-row'
+        - type: 'custom:button-toolbar-redux'
+          style: |
+            ha-card {
+              --bt-toolbar-background: var(--paper-card-background-color);
+              --bt-icon-active-color: var(--accent-color)
+              }
+          toolbar:
+            - type: service
+              name: Down
+              icon: mdi:skip-previous-outline
+              service:
+                name: script.neopixel_down
+            - type: service
+              name: Auto
+              icon: mdi:animation-play
+              service:
+                name: script.neopixel_play
+            - type: service
+              name: Up
+              icon: mdi:skip-next-outline
+              service:
+                name: script.neopixel_up

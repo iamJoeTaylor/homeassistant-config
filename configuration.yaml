@@ -47,6 +47,7 @@ script: !include scripts.yaml
 scene: !include scenes.yaml
 input_boolean: !include input_booleans.yaml
 input_text:
+input_number:
 
 lovelace:
   mode: yaml
