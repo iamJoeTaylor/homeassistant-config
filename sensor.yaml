@@ -25,7 +25,7 @@
   name: 'PurpleAir'
 
   resource: https://www.purpleair.com/json?show=76735
-  scan_interval: 60
+  scan_interval: 600
   force_update: true
 
   value_template: >
@@ -33,7 +33,7 @@
       {{ (((Ih - Il)/(BPh - BPl)) * (Cp - BPl) + Il)|round }}   
     {%- endmacro %}
     # Use the 10m average of PM25 and assign it to variable
-    {% set pm25 = value_json.results[0].Stats.split(',')[1].split(':')[1] %}
+    {% set pm25 = value_json.results[0].PM2_5Value %}
     {% if (pm25|float) > 1000 %}
       invalid
     {% elif (pm25|float) > 350.5 %}
@@ -56,32 +56,16 @@
 
   unit_of_measurement: "AQI"
   json_attributes:
-    - Stats
     - PM2_5Value
-    - LastSeen
-    - LastUpdateCheck
-    - Label
     - humidity
     - pressure
     - temp_f
   json_attributes_path: "$.results[0]"
 
-- platform: template
-  sensors:
-    berkeley_temperature:
-      value_template: '{{ states.sensor.purpleair.attributes["temp_f"] }}'
-      device_class: temperature
-      unit_of_measurement: '°F'
-- platform: template
-  sensors:
-    berkeley_humidity:
-      value_template: '{{ states.sensor.purpleair.attributes["humidity"] }}'
-      unit_of_measurement: '%'
-
-
 - platform: systemmonitor
   resources:
     - type: processor_use
+
 - platform: command_line
   name: Pi Temperature
   command: "cat /sys/class/thermal/thermal_zone0/temp"
@@ -100,155 +84,169 @@
     - 'time_utc'
     - 'beat'
 
-- platform: template
-  sensors:
-    sprinkler_status:
-      entity_id: [sensor.date_time, switch.sonoff_4ch_relay_1, switch.sonoff_4ch_relay_2, switch.sonoff_4ch_relay_3, switch.sonoff_4ch_relay_4]
-      friendly_name_template: >-
-        {% if states('switch.sonoff_4ch_relay_1') == 'on' %}
-          Top Flat
-        {% elif states('switch.sonoff_4ch_relay_2') == 'on' %}
-          Raised Bed
-        {% elif states('switch.sonoff_4ch_relay_3') == 'on' %}
-          Slope
-        {% elif states('switch.sonoff_4ch_relay_4') == 'on' %}
-          Street
-        {% else %}
-          Water Status
-        {% endif %}
-      value_template: >-
-        {% if states('switch.sonoff_4ch_relay_1') == 'on' %}
-          {% set switch_last_changed = states.switch.sonoff_4ch_relay_1.last_changed %}
-        {% elif states('switch.sonoff_4ch_relay_2') == 'on' %}
-          {% set switch_last_changed = states.switch.sonoff_4ch_relay_2.last_changed %}
-        {% elif states('switch.sonoff_4ch_relay_3') == 'on' %}
-          {% set switch_last_changed = states.switch.sonoff_4ch_relay_3.last_changed %}
-        {% elif states('switch.sonoff_4ch_relay_4') == 'on' %}
-          {% set switch_last_changed = states.switch.sonoff_4ch_relay_4.last_changed %}
-        {% endif %}
 
-        {% if switch_last_changed is defined %}
-          {% set run_time = (10 * 60) %}
-          {% set time = run_time - (as_timestamp(now()) - as_timestamp(switch_last_changed)) %}
-          {% set minutes = ((time % 3600) / 60) | int %}
-          {% set hours = ((time % 86400) / 3600) | int %}
-          {% set days = (time / 86400) | int %}
+# ---------- LEGACY SENSORS... moved to template.yaml --------
 
-          {%- if time < 60 -%}
-            Less than a minute
-            {%- else -%}
-            {%- if days > 0 -%}
-              {{ days }}d
-            {%- endif -%}
-            {%- if hours > 0 -%}
-              {%- if days > 0 -%}
-                {{ ' ' }}
-              {%- endif -%}
-              {{ hours }}h
-            {%- endif -%}
-            {%- if minutes > 0 -%}
-              {%- if days > 0 or hours > 0 -%}
-                {{ ' ' }}
-              {%- endif -%}
-              {{ minutes }}m
-            {%- endif -%}
-          {%- endif -%}
-          {{ ' ' }} remaining
-        {% else %}
-          Not Watering
-        {% endif %}
-      icon_template: >
-        {% if
-          states('switch.sonoff_4ch_relay_1') == 'on' or
-          states('switch.sonoff_4ch_relay_2') == 'on' or
-          states('switch.sonoff_4ch_relay_3') == 'on' or
-          states('switch.sonoff_4ch_relay_4') == 'on'
-        %}
-          mdi:valve-open
-        {% else %} mdi:valve-closed
-        {% endif %}
+# - platform: template
+#   sensors:
+#     berkeley_temperature:
+#       value_template: '{{ states.sensor.purpleair.attributes["temp_f"] }}'
+#       device_class: temperature
+#       unit_of_measurement: '°F'
+# - platform: template
+#   sensors:
+#     berkeley_humidity:
+#       value_template: '{{ states.sensor.purpleair.attributes["humidity"] }}'
+#       unit_of_measurement: '%'
 
-- platform: template
-  sensors:
-    sprinkler_last_run:
-      entity_id: [sensor.sprinkler_status, sensor.sprinkler_next_run, sensor.date_time, switch.sonoff_4ch_relay_1, switch.sonoff_4ch_relay_2, switch.sonoff_4ch_relay_3, switch.sonoff_4ch_relay_4]
-      friendly_name: "Last Run"
-      value_template: >-
-        {% macro friendly_date(timestamp) -%}
-          {% if as_timestamp(now()) | timestamp_custom("%j") == timestamp | timestamp_custom("%j") %}
-            Today at {{timestamp | timestamp_custom("%H:%M")}}
-          {% elif (as_timestamp(now())- (86400)) | timestamp_custom("%j") == timestamp | timestamp_custom("%j") %}
-            Yesterday at {{timestamp | timestamp_custom("%H:%M")}}
-          {% else %}
-           {{timestamp | timestamp_custom("%A, %d %h %H:%M")}}
-          {% endif %}
-        {%- endmacro %}
-        {% set zones = states.switch.sonoff_4ch_relay_1.last_changed,
-          states.switch.sonoff_4ch_relay_2.last_changed,
-          states.switch.sonoff_4ch_relay_3.last_changed,
-          states.switch.sonoff_4ch_relay_4.last_changed %}
-        {{friendly_date(as_timestamp(zones|max)) }}
+# - platform: template
+#   sensors:
+#     sprinkler_status:
+#       entity_id: [sensor.date_time, switch.sonoff_4ch_relay_1, switch.sonoff_4ch_relay_2, switch.sonoff_4ch_relay_3, switch.sonoff_4ch_relay_4]
+#       friendly_name_template: >-
+#         {% if states('switch.sonoff_4ch_relay_1') == 'on' %}
+#           Top Flat
+#         {% elif states('switch.sonoff_4ch_relay_2') == 'on' %}
+#           Raised Bed
+#         {% elif states('switch.sonoff_4ch_relay_3') == 'on' %}
+#           Slope
+#         {% elif states('switch.sonoff_4ch_relay_4') == 'on' %}
+#           Street
+#         {% else %}
+#           Water Status
+#         {% endif %}
+#       value_template: >-
+#         {% if states('switch.sonoff_4ch_relay_1') == 'on' %}
+#           {% set switch_last_changed = states.switch.sonoff_4ch_relay_1.last_changed %}
+#         {% elif states('switch.sonoff_4ch_relay_2') == 'on' %}
+#           {% set switch_last_changed = states.switch.sonoff_4ch_relay_2.last_changed %}
+#         {% elif states('switch.sonoff_4ch_relay_3') == 'on' %}
+#           {% set switch_last_changed = states.switch.sonoff_4ch_relay_3.last_changed %}
+#         {% elif states('switch.sonoff_4ch_relay_4') == 'on' %}
+#           {% set switch_last_changed = states.switch.sonoff_4ch_relay_4.last_changed %}
+#         {% endif %}
 
-- platform: template
-  sensors:
-    sprinkler_next_run:
-      entity_id: [sensor.sprinkler_status, sensor.sprinkler_last_run, sensor.date_time, switch.sonoff_4ch_relay_1, switch.sonoff_4ch_relay_2, switch.sonoff_4ch_relay_3, switch.sonoff_4ch_relay_4]
-      friendly_name: "Next Run"
-      value_template: >-
-        {% macro friendly_date(timestamp) -%}
-          {% if as_timestamp(now()) | timestamp_custom("%j") == timestamp | timestamp_custom("%j") %}
-            Today at {{timestamp | timestamp_custom("%H:%M")}}
-          {% elif (as_timestamp(now())+ (86400)) | timestamp_custom("%j") == timestamp | timestamp_custom("%j") %}
-            Tomorrow at {{timestamp | timestamp_custom("%H:%M")}}
-          {% else %}
-           {{timestamp | timestamp_custom("%A, %d %h %H:%M")}}
-          {% endif %}
-        {%- endmacro %}
+#         {% if switch_last_changed is defined %}
+#           {% set run_time = (10 * 60) %}
+#           {% set time = run_time - (as_timestamp(now()) - as_timestamp(switch_last_changed)) %}
+#           {% set minutes = ((time % 3600) / 60) | int %}
+#           {% set hours = ((time % 86400) / 3600) | int %}
+#           {% set days = (time / 86400) | int %}
 
-        {% macro date_at(at_hour, date) -%}
-          {{
-            friendly_date(
-              as_timestamp(
-                strptime(
-                    date |   timestamp_custom("%m/%d/%y") +
-                      " " + at_hour
-                    , "%m/%d/%y %H"
-                   )
-               )
-             )
-            }}
-         {%- endmacro %}
+#           {%- if time < 60 -%}
+#             Less than a minute
+#             {%- else -%}
+#             {%- if days > 0 -%}
+#               {{ days }}d
+#             {%- endif -%}
+#             {%- if hours > 0 -%}
+#               {%- if days > 0 -%}
+#                 {{ ' ' }}
+#               {%- endif -%}
+#               {{ hours }}h
+#             {%- endif -%}
+#             {%- if minutes > 0 -%}
+#               {%- if days > 0 or hours > 0 -%}
+#                 {{ ' ' }}
+#               {%- endif -%}
+#               {{ minutes }}m
+#             {%- endif -%}
+#           {%- endif -%}
+#           {{ ' ' }} remaining
+#         {% else %}
+#           Not Watering
+#         {% endif %}
+#       icon_template: >
+#         {% if
+#           states('switch.sonoff_4ch_relay_1') == 'on' or
+#           states('switch.sonoff_4ch_relay_2') == 'on' or
+#           states('switch.sonoff_4ch_relay_3') == 'on' or
+#           states('switch.sonoff_4ch_relay_4') == 'on'
+#         %}
+#           mdi:valve-open
+#         {% else %} mdi:valve-closed
+#         {% endif %}
 
-        {% set today = as_timestamp(now()) %}
-        {% set tomorrow = (as_timestamp(now())+ (86400)) %}
-        {% set day_after_tomorrow = (as_timestamp(now())+ (2 * 86400)) %}
+# - platform: template
+#   sensors:
+#     sprinkler_last_run:
+#       entity_id: [sensor.sprinkler_status, sensor.sprinkler_next_run, sensor.date_time, switch.sonoff_4ch_relay_1, switch.sonoff_4ch_relay_2, switch.sonoff_4ch_relay_3, switch.sonoff_4ch_relay_4]
+#       friendly_name: "Last Run"
+#       value_template: >-
+#         {% macro friendly_date(timestamp) -%}
+#           {% if as_timestamp(now()) | timestamp_custom("%j") == timestamp | timestamp_custom("%j") %}
+#             Today at {{timestamp | timestamp_custom("%H:%M")}}
+#           {% elif (as_timestamp(now())- (86400)) | timestamp_custom("%j") == timestamp | timestamp_custom("%j") %}
+#             Yesterday at {{timestamp | timestamp_custom("%H:%M")}}
+#           {% else %}
+#            {{timestamp | timestamp_custom("%A, %d %h %H:%M")}}
+#           {% endif %}
+#         {%- endmacro %}
+#         {% set zones = states.switch.sonoff_4ch_relay_1.last_changed,
+#           states.switch.sonoff_4ch_relay_2.last_changed,
+#           states.switch.sonoff_4ch_relay_3.last_changed,
+#           states.switch.sonoff_4ch_relay_4.last_changed %}
+#         {{friendly_date(as_timestamp(zones|max)) }}
 
-        {% if now().strftime('%j')|int % 2 == 0 %}
-          {% if now().hour < 4 %}
-            {# must be today 4am #}
-            {{date_at("4", today) }}
-          {% elif now().hour < 14 %}
-            {# must be today 2pm #}
-            {{date_at("14", today) }}
-          {% else %}
-            {# must be day_after_tomorrow 4am #}
-            {{date_at("4", day_after_tomorrow) }}
-          {% endif %}
-        {% else %}
-          {# must be tomorrow 4am #}
-           {{date_at("4", tomorrow) }}
-        {% endif %}
+# - platform: template
+#   sensors:
+#     sprinkler_next_run:
+#       entity_id: [sensor.sprinkler_status, sensor.sprinkler_last_run, sensor.date_time, switch.sonoff_4ch_relay_1, switch.sonoff_4ch_relay_2, switch.sonoff_4ch_relay_3, switch.sonoff_4ch_relay_4]
+#       friendly_name: "Next Run"
+#       value_template: >-
+#         {% macro friendly_date(timestamp) -%}
+#           {% if as_timestamp(now()) | timestamp_custom("%j") == timestamp | timestamp_custom("%j") %}
+#             Today at {{timestamp | timestamp_custom("%H:%M")}}
+#           {% elif (as_timestamp(now())+ (86400)) | timestamp_custom("%j") == timestamp | timestamp_custom("%j") %}
+#             Tomorrow at {{timestamp | timestamp_custom("%H:%M")}}
+#           {% else %}
+#            {{timestamp | timestamp_custom("%A, %d %h %H:%M")}}
+#           {% endif %}
+#         {%- endmacro %}
 
-- platform: template
-  sensors:
-    canvas_entity_list:
-      value_template: "{{state_attr('light.canvas', 'effect_list')|join(',')}}"
-- platform: template
-  sensors:
-    nanoleaf_entity_list:
-      value_template: "{{state_attr('light.nanoleaf', 'effect_list')|join(',')}}"
+#         {% macro date_at(at_hour, date) -%}
+#           {{
+#             friendly_date(
+#               as_timestamp(
+#                 strptime(
+#                     date |   timestamp_custom("%m/%d/%y") +
+#                       " " + at_hour
+#                     , "%m/%d/%y %H"
+#                    )
+#                )
+#              )
+#             }}
+#          {%- endmacro %}
 
-- platform: template
-  sensors:
-    neopixel_panel_effect_list:
-      value_template: "{{state_attr('light.joe_neopixel_panel_light', 'effect_list')|join(',')}}"
+#         {% set today = as_timestamp(now()) %}
+#         {% set tomorrow = (as_timestamp(now())+ (86400)) %}
+#         {% set day_after_tomorrow = (as_timestamp(now())+ (2 * 86400)) %}
+
+#         {% if now().strftime('%j')|int % 2 == 0 %}
+#           {% if now().hour < 4 %}
+#             {# must be today 4am #}
+#             {{date_at("4", today) }}
+#           {% elif now().hour < 14 %}
+#             {# must be today 2pm #}
+#             {{date_at("14", today) }}
+#           {% else %}
+#             {# must be day_after_tomorrow 4am #}
+#             {{date_at("4", day_after_tomorrow) }}
+#           {% endif %}
+#         {% else %}
+#           {# must be tomorrow 4am #}
+#            {{date_at("4", tomorrow) }}
+#         {% endif %}
+
+# - platform: template
+#   sensors:
+#     canvas_entity_list:
+#       value_template: "{{state_attr('light.canvas', 'effect_list')|join(',')}}"
+# - platform: template
+#   sensors:
+#     nanoleaf_entity_list:
+#       value_template: "{{state_attr('light.nanoleaf', 'effect_list')|join(',')}}"
+# - platform: template
+#   sensors:
+#     neopixel_panel_effect_list:
+#       value_template: "{{state_attr('light.joe_neopixel_panel_light', 'effect_list')|join(',')}}"

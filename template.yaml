@@ -1,0 +1,154 @@
+- sensor:
+  - name: "Berkeley temperature"
+    unit_of_measurement: '°F'
+    device_class: temperature
+    state: >
+      {{ states.sensor.purpleair.attributes["temp_f"] }}
+
+- sensor:
+  - name: "Berkeley humidity"
+    unit_of_measurement: '%'
+    state: >
+      {{ states.sensor.purpleair.attributes["humidity"] }}
+
+- sensor:
+  - name: "Canvas Entity List"
+    state: "{{state_attr('light.canvas', 'effect_list') | join(',')}}"
+- sensor:
+  - name: "Nanoleaf Entity List"
+    state: "{{state_attr('light.nanoleaf', 'effect_list') | join(',')}}"
+- sensor:
+  - name: "NeoPixel Panel Entity List"
+    state: "{{state_attr('light.joe_neopixel_panel_light', 'effect_list') | join(',')}}"
+
+- sensor:
+  - unique_id: sprinkler_status
+    attributes:
+      friendly_name: >
+        {% if states('switch.sonoff_4ch_relay_1') == 'on' %}
+          Top Flat
+        {% elif states('switch.sonoff_4ch_relay_2') == 'on' %}
+          Raised Bed
+        {% elif states('switch.sonoff_4ch_relay_3') == 'on' %}
+          Slope
+        {% elif states('switch.sonoff_4ch_relay_4') == 'on' %}
+          Street
+        {% else %}
+          Water Status
+        {% endif %}
+    state: >
+      {% if states('switch.sonoff_4ch_relay_1') == 'on' %}
+        {% set switch_last_changed = states.switch.sonoff_4ch_relay_1.last_changed %}
+      {% elif states('switch.sonoff_4ch_relay_2') == 'on' %}
+        {% set switch_last_changed = states.switch.sonoff_4ch_relay_2.last_changed %}
+      {% elif states('switch.sonoff_4ch_relay_3') == 'on' %}
+        {% set switch_last_changed = states.switch.sonoff_4ch_relay_3.last_changed %}
+      {% elif states('switch.sonoff_4ch_relay_4') == 'on' %}
+        {% set switch_last_changed = states.switch.sonoff_4ch_relay_4.last_changed %}
+      {% endif %}
+
+      {% if switch_last_changed is defined %}
+        {% set run_time = (10 * 60) %}
+        {% set time = run_time - (as_timestamp(now()) - as_timestamp(switch_last_changed)) %}
+        {% set minutes = ((time % 3600) / 60) | int %}
+        {% set hours = ((time % 86400) / 3600) | int %}
+        {% set days = (time / 86400) | int %}
+
+        {%- if time < 60 -%}
+          Less than a minute
+          {%- else -%}
+          {%- if days > 0 -%}
+            {{ days }}d
+          {%- endif -%}
+          {%- if hours > 0 -%}
+            {%- if days > 0 -%}
+              {{ ' ' }}
+            {%- endif -%}
+            {{ hours }}h
+          {%- endif -%}
+          {%- if minutes > 0 -%}
+            {%- if days > 0 or hours > 0 -%}
+              {{ ' ' }}
+            {%- endif -%}
+            {{ minutes }}m
+          {%- endif -%}
+        {%- endif -%}
+        {{ ' ' }} remaining
+      {% else %}
+        Not Watering
+      {% endif %}
+    icon: >
+      {% if
+        states('switch.sonoff_4ch_relay_1') == 'on' or
+        states('switch.sonoff_4ch_relay_2') == 'on' or
+        states('switch.sonoff_4ch_relay_3') == 'on' or
+        states('switch.sonoff_4ch_relay_4') == 'on'
+      %}
+        mdi:valve-open
+      {% else %} mdi:valve-closed
+      {% endif %}
+
+- sensor:
+  - name: "sprinkler last run"
+    state: >
+      {% macro friendly_date(timestamp) -%}
+        {% if as_timestamp(now()) | timestamp_custom("%j") == timestamp | timestamp_custom("%j") %}
+          Today at {{timestamp | timestamp_custom("%H:%M")}}
+        {% elif (as_timestamp(now())- (86400)) | timestamp_custom("%j") == timestamp | timestamp_custom("%j") %}
+          Yesterday at {{timestamp | timestamp_custom("%H:%M")}}
+        {% else %}
+         {{timestamp | timestamp_custom("%A, %d %h %H:%M")}}
+        {% endif %}
+      {%- endmacro %}
+      {% set zones = states.switch.sonoff_4ch_relay_1.last_changed,
+        states.switch.sonoff_4ch_relay_2.last_changed,
+        states.switch.sonoff_4ch_relay_3.last_changed,
+        states.switch.sonoff_4ch_relay_4.last_changed %}
+      {{friendly_date(as_timestamp(zones|max)) }}
+
+- sensor:
+  - name: "sprinkler next run"
+    state: >
+      {% macro friendly_date(timestamp) -%}
+        {% if as_timestamp(now()) | timestamp_custom("%j") == timestamp | timestamp_custom("%j") %}
+          Today at {{timestamp | timestamp_custom("%H:%M")}}
+        {% elif (as_timestamp(now())+ (86400)) | timestamp_custom("%j") == timestamp | timestamp_custom("%j") %}
+          Tomorrow at {{timestamp | timestamp_custom("%H:%M")}}
+        {% else %}
+         {{timestamp | timestamp_custom("%A, %d %h %H:%M")}}
+        {% endif %}
+      {%- endmacro %}
+
+      {% macro date_at(at_hour, date) -%}
+        {{
+          friendly_date(
+            as_timestamp(
+              strptime(
+                  date |   timestamp_custom("%m/%d/%y") +
+                    " " + at_hour
+                  , "%m/%d/%y %H"
+                 )
+             )
+           )
+          }}
+       {%- endmacro %}
+
+      {% set today = as_timestamp(now()) %}
+      {% set tomorrow = (as_timestamp(now())+ (86400)) %}
+      {% set day_after_tomorrow = (as_timestamp(now())+ (2 * 86400)) %}
+
+      {% if now().strftime('%j')|int % 2 == 0 %}
+        {% if now().hour < 4 %}
+          {# must be today 4am #}
+          {{date_at("4", today) }}
+        {% elif now().hour < 14 %}
+          {# must be today 2pm #}
+          {{date_at("14", today) }}
+        {% else %}
+          {# must be day_after_tomorrow 4am #}
+          {{date_at("4", day_after_tomorrow) }}
+        {% endif %}
+      {% else %}
+        {# must be tomorrow 4am #}
+         {{date_at("4", tomorrow) }}
+      {% endif %}

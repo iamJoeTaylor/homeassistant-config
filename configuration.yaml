@@ -141,7 +141,6 @@ system_health:
 
 # Checks for available updates
 updater:
-  include_used_components: true
 
 ## Section: Integration Config
 
@@ -170,6 +169,8 @@ discovery:
 sensor: !include sensor.yaml
 
 binary_sensor: !include binary_sensors.yaml
+
+template: !include template.yaml
 
 circadian_lighting:
 

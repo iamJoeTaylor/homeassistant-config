@@ -77,19 +77,15 @@
   trigger:
     - platform: time
       at: '04:00:00'
-  condition:
-    condition: and
-    conditions:
-      - condition: template
-        value_template: "{{now().strftime('%j')|int % 2 == 0}}"
-      - condition:
-          condition: state
-          entity_id: input_boolean.skip_watering
-          state: 'off'
-      - condition:
-          condition: state
-          entity_id: input_boolean.turn_off_watering
-          state: 'off'
+  conditions:
+    - condition: template
+      value_template: "{{now().strftime('%j')|int % 2 == 0}}"
+    - condition: state
+      entity_id: "input_boolean.skip_watering"
+      state: 'off'
+    - condition: state
+      entity_id: "input_boolean.turn_off_watering"
+      state: 'off'
   action:
     - service: script.sprinkler_water_front
 
@@ -97,18 +93,14 @@
   trigger:
     - platform: time
       at: '14:00:00'
-  condition:
-    condition: and
-    conditions:
-      - condition: template
-        value_template: "{{now().strftime('%j')|int % 2 == 0}}"
-      - condition:
-          condition: state
-          entity_id: input_boolean.skip_watering
-          state: 'off'
-      - condition:
-          condition: state
-          entity_id: input_boolean.turn_off_watering
-          state: 'off'
+  conditions:
+    - condition: template
+      value_template: "{{now().strftime('%j')|int % 2 == 0}}"
+    - condition: state
+      entity_id: "input_boolean.skip_watering"
+      state: 'off'
+    - condition: state
+      entity_id: "input_boolean.turn_off_watering"
+      state: 'off'
   action:
     - service: script.sprinkler_water_front
