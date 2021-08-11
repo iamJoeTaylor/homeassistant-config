@@ -17,6 +17,9 @@
     - ups.load
     - ups.status
 
+- platform: peloton
+  username: !secret joe_pel_un
+  password: !secret joe_pel_pw
 
 - platform: rest
   name: 'PurpleAir'
@@ -125,7 +128,7 @@
         {% endif %}
 
         {% if switch_last_changed is defined %}
-          {% set run_time = (7 * 60) %}
+          {% set run_time = (10 * 60) %}
           {% set time = run_time - (as_timestamp(now()) - as_timestamp(switch_last_changed)) %}
           {% set minutes = ((time % 3600) / 60) | int %}
           {% set hours = ((time % 86400) / 3600) | int %}

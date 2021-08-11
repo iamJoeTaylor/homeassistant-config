@@ -26,31 +26,57 @@
 
     - type: vertical-stack
       cards:
-        - entity: light.joe_neopixel_panel_light
-          hide_when_off: true
-          name: Neopixel Panel
-          toggle: true
-          attribute: effect
-          type: 'custom:slider-entity-row'
-        - type: 'custom:button-toolbar-redux'
-          style: |
-            ha-card {
-              --bt-toolbar-background: var(--paper-card-background-color);
-              --bt-icon-active-color: var(--accent-color)
-              }
-          toolbar:
-            - type: service
-              name: Down
-              icon: mdi:skip-previous-outline
-              service:
-                name: script.neopixel_down
-            - type: service
-              name: Auto
-              icon: mdi:animation-play
-              service:
-                name: script.neopixel_play
-            - type: service
-              name: Up
-              icon: mdi:skip-next-outline
-              service:
-                name: script.neopixel_up
+        - show_header_toggle: false
+          type: entities
+          entities:
+            - entity: light.pixel_frame_light
+              hide_when_off: true
+              name: Pixel Frame
+              toggle: true
+              type: 'custom:slider-entity-row'
+
+    - type: vertical-stack
+      cards:
+        - type: markdown
+          content: |
+            {% if state_attr('sensor.peloton_iamjoetaylor', "Resistance %") | float > 0 -%}
+            ### Current Metrics:
+            
+            <br><font color="firebrick"><ha-icon icon="mdi:heart-pulse"></ha-icon></font> **Heart Rate (bpm):** {{ state_attr('sensor.peloton_iamjoetaylor', "Heart Rate Bpm") }}
+            <br><font color="darkorange"><ha-icon icon="mdi:omega"></ha-icon></font> **Resistance (%):** {{ state_attr('sensor.peloton_iamjoetaylor', "Resistance %") }}
+            <br><font color="darkorchid"><ha-icon icon="mdi:speedometer"></ha-icon></font> **Speed (Mph):** {{ state_attr('sensor.peloton_iamjoetaylor', "Speed Mph") }}
+            <br><font color="darkorchid"><ha-icon icon="mdi:speedometer"></ha-icon></font> **Speed (Kph):** {{ state_attr('sensor.peloton_iamjoetaylor', "Speed Kph") }}
+            <br><font color="mediumseagreen"><ha-icon icon="mdi:sine-wave"></ha-icon></font> **Cadence Rpm:** {{ state_attr('sensor.peloton_iamjoetaylor', "Cadence Rpm") }}
+            <br><font color="orangered"><ha-icon icon="mdi:lightning-bolt"></ha-icon></font> **Power (W):** {{ state_attr('sensor.peloton_iamjoetaylor', "Power W") }}
+            
+            ---
+            
+            {%- endif %}
+            
+            ### Latest Workout Summary:
+            
+            <ha-icon icon="mdi:calendar-range"></ha-icon>  - **Date:** {{ state_attr('sensor.peloton_iamjoetaylor', "Start Time")|float|timestamp_custom('%Y/%m/%d &raquo; %H:%M') }} - {{ state_attr('sensor.peloton_iamjoetaylor', "End Time")|float|timestamp_custom('%H:%M') }} ({{ state_attr('sensor.peloton_iamjoetaylor', "Duration Min") }} mins)
+            
+            {% if (state_attr('sensor.peloton_iamjoetaylor', 'Workout Image')|string != 'None') %}
+              <img src="{{ state_attr('sensor.peloton_iamjoetaylor', "Workout Image") }}">
+            {% endif %}
+            
+            **{{ state_attr('sensor.peloton_iamjoetaylor', "Ride Title") }} ({{ state_attr('sensor.peloton_iamjoetaylor', "Workout Type") }})**
+            - *{{ state_attr('sensor.peloton_iamjoetaylor', "Description") }}* 
+            - Instructor: {{ state_attr('sensor.peloton_iamjoetaylor', "Instructor") }}
+            
+            ---
+            
+            ### Latest Workout Metrics:
+            
+            <font color="royalblue"><ha-icon icon="mdi:map-marker-distance"></ha-icon></font>  - **Distance (Mi):** {{ state_attr('sensor.peloton_iamjoetaylor', "Distance Mi") | float | round(2) }}
+            <font color="firebrick"><ha-icon icon="mdi:heart-pulse"></ha-icon></font> - **Heart Rate (bpm):** {{ state_attr('sensor.peloton_iamjoetaylor', "Heart Rate Average Bpm") | float | round(0) }} avg / {{ state_attr('sensor.peloton_iamjoetaylor', "Heart Rate Max Bpm")  | float | round(0) }} max
+            <font color="darkorange"><ha-icon icon="mdi:omega"></ha-icon></font> - **Resistance:** {{ state_attr('sensor.peloton_iamjoetaylor', "Resistance Average %") | float | round(0) }}% avg / {{ state_attr('sensor.peloton_iamjoetaylor', "Resistance Max %") | float | round(0) }}% max
+            <font color="darkorchid"><ha-icon icon="mdi:speedometer"></ha-icon></font> - **Speed (Mph):** {{ state_attr('sensor.peloton_iamjoetaylor', "Speed Average Mph")  | float | round(2) }}  avg / {{ state_attr('sensor.peloton_iamjoetaylor', "Speed Max Mph")  | float | round(2) }} max
+            <font color="darkorchid"><ha-icon icon="mdi:speedometer"></ha-icon></font> - **Speed (Kph):** {{ state_attr('sensor.peloton_iamjoetaylor', "Speed Average Kph")  | float | round(2) }}  avg / {{ state_attr('sensor.peloton_iamjoetaylor', "Speed Max Kph")  | float | round(2) }} max
+            <font color="mediumseagreen"><ha-icon icon="mdi:sine-wave"></ha-icon></font> - **Cadence (Rpm):** {{ state_attr('sensor.peloton_iamjoetaylor', "Cadence Average Rpm")  | float | round(0) }} avg / {{ state_attr('sensor.peloton_iamjoetaylor', "Cadence Max Rpm")  | float | round(0) }} max
+            <font color="orangered"><ha-icon icon="mdi:lightning-bolt"></ha-icon></font> - **Power (W):** {{ state_attr('sensor.peloton_iamjoetaylor', "Power Average W")  | float | round(2) }} avg / {{ state_attr('sensor.peloton_iamjoetaylor', "Power Max W")  | float | round(2) }} max
+            <font color="orangered"><ha-icon icon="mdi:lightning-bolt"></ha-icon></font> - **Total Work:** {{ state_attr('sensor.peloton_iamjoetaylor', "Total Work")  | float | round(0) }} J
+            <font color="orangered"><ha-icon icon="mdi:lightning-bolt"></ha-icon></font> - **Output (KJ):** {{ state_attr('sensor.peloton_iamjoetaylor', "Output Kj")  | float | round(2) }}
+            <font color="crimson"><ha-icon icon="mdi:food"></ha-icon></font> - **Calories (KCal):** {{ state_attr('sensor.peloton_iamjoetaylor', "Calories KCal") }}
+            <font color="yellowgreen"><ha-icon icon="mdi:chevron-triple-up"></ha-icon></font> - **Leaderboard Rank:** {{ state_attr('sensor.peloton_iamjoetaylor', "Leaderboard Rank") }} / {{ state_attr('sensor.peloton_iamjoetaylor', "Leaderboard Users") }} ({{ 100 - (100 * (state_attr('sensor.peloton_iamjoetaylor', "Leaderboard Rank") | int ) / (state_attr('sensor.peloton_iamjoetaylor', "Leaderboard Users") | int)) | round(0) }}%)

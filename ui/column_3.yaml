@@ -1,17 +1,3 @@
-- cards:
-    - entity: sensor.speedtest_download
-      graph: line
-      hours_to_show: 48
-      name: Down
-      type: sensor
-      unit: Mbps
-    - entity: sensor.speedtest_upload
-      graph: line
-      hours_to_show: 48
-      name: Up
-      type: sensor
-      unit: Mbps
-  type: horizontal-stack
 - type: horizontal-stack
   cards:
     - entities:

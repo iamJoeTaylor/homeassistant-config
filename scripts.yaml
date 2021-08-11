@@ -179,8 +179,6 @@ sleep:
       entity_id: switch.power_computer
     - service: switch.turn_off
       entity_id: group.power_bar
-    - service: switch.turn_off
-      entity_id: switch.fountain_plug_on_off
 
 wakeup:
   sequence:
@@ -192,8 +190,6 @@ wakeup:
       entity_id: light.hall_hue
     - service: switch.turn_on
       entity_id: group.power_bar
-    - service: switch.turn_on
-      entity_id: switch.fountain_plug_on_off
 
 toggle_night_light:
   sequence:
@@ -205,46 +201,48 @@ toggle_night_light:
         brightness_pct: 45
         color_temp: 400
 
-sprinkler_water_front:
-  alias: "Sprinkler Water Frontyard"
+sprinkler_all_off:
+  alias: "Sprinkler All Off"
   sequence:
     # Top
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_1
-
     # Raised Bed
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_2
-
     # Slope
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_3
-
     # Street
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_4
 
+sprinkler_water_front:
+  alias: "Sprinkler Water Frontyard"
+  sequence:
+    - service: script.sprinkler_all_off
+
     - delay: '00:01'
     - service: switch.turn_on
       entity_id: switch.sonoff_4ch_relay_1
-    - delay: '00:08'
+    - delay: '00:10'
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_1
     - delay: '00:01'
     - service: switch.turn_on
       entity_id: switch.sonoff_4ch_relay_2
-    - delay: '00:08'
+    - delay: '00:10'
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_2
     - delay: '00:01'
     - service: switch.turn_on
       entity_id: switch.sonoff_4ch_relay_3
-    - delay: '00:08'
+    - delay: '00:10'
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_3
     - delay: '00:01'
     - service: switch.turn_on
       entity_id: switch.sonoff_4ch_relay_4
-    - delay: '00:08'
+    - delay: '00:10'
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_4

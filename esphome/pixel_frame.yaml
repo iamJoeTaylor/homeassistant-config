@@ -1,0 +1,174 @@
+# Example for some matrix led effects, especially a scrolling clock/mqtt text display
+# set the text via:
+#  mosquitto_pub -h mqtthost -t text/text -m "Hi there!"
+
+substitutions:
+  devicename: pixel_frame
+  matrixwidth: "16" # in pix
+  matrixheight: "16" # in pix
+  scrollinterval: "0.2" # in seconds
+  xscrollpadding: "4" # in pix
+
+esphome:
+  name: $devicename
+  platform: ESP8266
+  board: d1_mini
+  includes:
+    - my_matrixled_scrolling_display.h
+  on_boot:
+    priority: -10
+    then: # stop the flickering
+      - lambda: |-
+            fastled_base_fastledlightoutput->get_controller()->setDither(0);
+      # - light.turn_on:
+      #       id: mylight
+      #       brightness: 100%
+      #       effect: "mario block"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_pw
+  fast_connect: true
+
+# mqtt:
+#   id: mqtt_client
+#   broker: 192.168.7.171
+
+
+# text_sensor:
+#   - platform: mqtt_subscribe
+#     name: "Text"
+#     id: extratext
+#     topic: text/text
+
+text_sensor:
+  - platform: homeassistant
+    name: "input text"
+    entity_id: input_text.panel_text
+    id: panel_text
+
+logger:
+
+debug:
+
+ota:
+
+# Enable Home Assistant API
+api:
+
+font:
+  - id: tinyfont
+    file: "DejaVuSans-Bold.ttf"
+    size: 12
+    glyphs: "♡Ωäöüß!%()+,-_.:*=°?~#0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz"
+
+time:
+  - platform: sntp
+    id: rtctime
+
+light:
+  - platform: fastled_clockless
+    chipset: WS2812
+    pin: 3
+    num_leds: 256
+    rgb_order: GRB
+    name: "$devicename Light"
+    id: mylight
+    # color_correct: [40%, 40%, 40%]
+    # effects:
+    #   - lambda:
+    #       name: "goomba_animation"
+    #       update_interval: 500ms
+    #       lambda: |-
+    #         static uint16_t run = 0;
+    #         if (run == 0)
+    #           id(matrix_display).show_page(id(page1));
+    #         run++;
+    #   - lambda:
+    #       name: "2"
+    #       update_interval: 500ms
+    #       lambda: |-
+    #         static uint16_t run = 0;
+    #         if (run == 0)
+    #           id(matrix_display).show_page(id(page2));
+    #         run++;
+
+      # - addressable_lambda:
+      #     name: "goomba_animation"
+      #     update_interval: 200ms
+      #     lambda: |-
+      #       id(matrix_display).fill(COLOR_OFF);
+      #       id(goomba_animation).next_frame();
+      #       id(matrix_display).image(0, 0, id(goomba_animation), COLOR_ON, COLOR_OFF);
+      # - addressable_lambda:
+      #     name: "block_animation"
+      #     update_interval: 200ms
+      #     lambda: |-
+      #       id(matrix_display).fill(COLOR_OFF);
+      #       id(block_animation).next_frame();
+      #       id(matrix_display).image(0, 0, id(block_animation), COLOR_ON, COLOR_OFF);
+   
+animation:
+  - file: "matrix.gif"
+    id: matrix_animation
+    type: RGB24
+  - file: "mona.png"
+    id: mona
+    type: RGB24
+  - file: "goomba.gif"
+    id: goomba_animation
+    type: RGB24
+  - file: "block.gif"
+    id: block_animation
+    type: RGB24
+
+interval:
+  - interval: 500ms
+    then:
+      lambda: |-
+        id(current_animation).next_frame();
+
+globals:
+   - id: current_animation
+     type: Animation
+
+display:
+  - platform: addressable_light
+    id: matrix_display
+    addressable_light_id: mylight
+    width: 16
+    height: 16
+    rotation: 0°
+    pixel_mapper: |-
+      if (y % 2 == 0) {
+        return (y * 16) + (15 - x);
+      }
+      return (y * 16) + x;
+    pages:
+      - id: page1
+        lambda: |-
+          id(current_animation) = id(block_animation);
+          it.image(0, 0, id(block_animation), COLOR_ON, COLOR_OFF);
+      - id: page2
+        lambda: |-
+          id(current_animation) = id(goomba_animation);
+          it.image(0, 0, id(goomba_animation), COLOR_ON, COLOR_OFF);
+    # update_interval: 200ms
+    # lambda: |-
+    #   it.fill(COLOR_OFF);
+    #   id(block_animation).next_frame();
+    #   it.image(0, 0, id(block_animation), COLOR_ON, COLOR_OFF);
+    # lambda: |-
+    #       static uint16_t xpos = 0;
+    #       const char * text = id(panel_text).state.c_str();
+     
+    #       int x_start, y_start;
+    #       int width, height;
+              
+    #       it.get_text_bounds(0, 0, text, id(tinyfont), 
+    #           TextAlign::TOP_LEFT, &x_start, &y_start, &width, &height); 
+          
+    #       it.print(-(xpos % (width + $xscrollpadding)), -2, 
+    #         id(tinyfont), Color(0xFF1010), 
+    #         TextAlign::TOP_LEFT, text); 
+    #       xpos++;

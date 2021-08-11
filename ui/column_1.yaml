@@ -17,7 +17,7 @@
           name: Bedroom Room
           show_legend: false
           color: '#EC6653'
-        - entity: sensor.dyson_temperature
+        - entity: sensor.pure_cool_link_temperature
           name: Living Room
           show_legend: false
           color: '#e74c3c'
@@ -42,7 +42,7 @@
           name: Bella's Room
           show_legend: false
           color: '#2D84BE'
-        - entity: sensor.dyson_humidity
+        - entity: sensor.pure_cool_link_humidity
           name: Living Room
           show_legend: false
           color: '#66C1E2'
@@ -60,7 +60,7 @@
 - type: horizontal-stack
   cards:
     - entities:
-        - entity: sensor.dyson_aqi
+        - entity: sensor.pure_cool_link_air_quality
           index: 0
       font_size: 75
       icon: 'mdi:chart-line'
@@ -103,3 +103,36 @@
       name: Berkeley AQI
       type: 'custom:mini-graph-card'
 
+
+- type: vertical-stack
+  cards:
+    - show_header_toggle: false
+      type: entities
+      entities:
+        - entity: light.joe_neopixel_panel_light
+          hide_when_off: true
+          name: Fireplace
+          toggle: true
+          attribute: effect
+          type: 'custom:slider-entity-row'
+        - type: 'custom:button-toolbar-redux'
+          style: |
+            ha-card {
+              --bt-icon-active-color: var(--accent-color)
+              }
+          toolbar:
+            - type: service
+              name: Down
+              icon: mdi:skip-previous-outline
+              service:
+                name: script.neopixel_down
+            - type: service
+              name: Auto
+              icon: mdi:animation-play
+              service:
+                name: script.neopixel_play
+            - type: service
+              name: Up
+              icon: mdi:skip-next-outline
+              service:
+                name: script.neopixel_up

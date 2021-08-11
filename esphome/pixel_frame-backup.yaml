@@ -1,0 +1,676 @@
+# Example for some matrix led effects, especially a scrolling clock/mqtt text display
+# set the text via:
+#  mosquitto_pub -h mqtthost -t text/text -m "Hi there!"
+
+substitutions:
+  devicename: pixel_frame
+  matrixwidth: "16" # in pix
+  matrixheight: "16" # in pix
+  scrollinterval: "0.2" # in seconds
+
+esphome:
+  name: $devicename
+  platform: ESP8266
+  board: d1_mini
+  includes:
+    - my_matrixled_scrolling_display.h
+  on_boot:
+    priority: -10
+    then: # stop the flickering
+      - lambda: |-
+            fastled_base_fastledlightoutput->get_controller()->setDither(0);
+      - light.turn_on:
+            id: mylight
+            brightness: 100%
+            effect: "mario block"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_pw
+  fast_connect: true
+
+# mqtt:
+#   id: mqtt_client
+#   broker: 192.168.7.171
+
+
+# text_sensor:
+#   - platform: mqtt_subscribe
+#     name: "Text"
+#     id: extratext
+#     topic: text/text
+
+text_sensor:
+  - platform: homeassistant
+    name: "input text"
+    entity_id: input_text.panel_text
+    id: panel_text
+
+logger:
+
+# debug:
+
+ota:
+
+# Enable Home Assistant API
+api:
+
+font:
+  - id: tinyfont
+    file: "Inter-Bold.ttf"
+    size: 17
+    glyphs: '♡Ωäöüß!"%()+,-_.:*=°?~#0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz'
+
+animation:
+  - file: "matrix.gif"
+    id: matrix_animation
+    type: RGB24
+  - file: "mona.png"
+    id: mona
+    type: RGB24
+  - file: "goomba.gif"
+    id: goomba_animation
+    type: RGB24
+  - file: "block.gif"
+    id: block_animation
+    type: RGB24
+  - file: "coin.gif"
+    id: coin_animation
+    type: RGB24
+  - file: "mushroom.png"
+    id: mushroom_animation
+    type: RGB24
+  - file: "zelda_fire_render-2.gif"
+    id: fire_animation
+    resize: 16x16
+    type: RGB24
+  - file: "zelda-skeleton.gif"
+    id: skeleton_animation
+    resize: 16x16
+    type: RGB24
+  - file: "boss-key.png"
+    id: boss_key_animation
+    resize: 16x16
+    type: RGB24
+  - file: "frisk.png"
+    id: frisk
+    type: RGB24
+  - file: "blocks.gif"
+    id: color_blocks
+    type: RGB24
+  - file: "coffee.gif"
+    id: coffee
+    type: RGB24
+  - file: "face.gif"
+    id: face
+    type: RGB24
+  - file: "fire.gif"
+    id: fire
+    type: RGB24
+  - file: "fish.gif"
+    id: fish
+    type: RGB24
+  - file: "octorok.gif"
+    id: octorok
+    type: RGB24
+  - file: "water.gif"
+    id: water
+    type: RGB24
+  - file: "zelda-walk.gif"
+    id: zelda_walk
+    type: RGB24
+
+
+time:
+  - platform: sntp
+    id: rtctime
+
+light:
+  - platform: fastled_clockless
+    chipset: WS2812
+    pin: 3
+    num_leds: 256
+    rgb_order: GRB
+    name: "$devicename Light"
+    id: mylight
+    color_correct: [40%, 40%, 40%]
+    effects:
+      - addressable_random_twinkle:
+      - addressable_fireworks:
+      - addressable_flicker:
+      - addressable_rainbow:
+      - addressable_color_wipe:
+
+
+      - addressable_lambda:
+          name: "Clock"
+          update_interval: 500ms
+          lambda: |-
+            static uint16_t run = 0;
+            static auto matrixled = new MatrixLedScrollingDisplay();
+            Color c;
+
+            if (run == 0) {
+              matrixled->set_size($matrixwidth, $matrixheight);
+            }
+            matrixled->fill(Color(0.5, 0., 0.));
+            float halfheight = ($matrixheight - 0.1) / 2;
+            float halfwidth = ($matrixwidth - 0.1) / 2;
+            float theta;
+            int minutes = -1;
+            int hours = -1;
+            if ((id(rtctime).now()).is_valid()){
+                minutes = id(rtctime).now().minute;
+                hours = id(rtctime).now().hour;
+
+                //fast forward...
+                //minutes = int(id(rtctime).now().time * 20.) % 60;
+                //hours = int(id(rtctime).now().time * 20. / 60.) % 12;
+            };
+            for (int i=0; i < 12; i++){
+                theta = i * 2 * 3.141 / 12.0;
+                if (i==0)
+                    c=Color(0., 0., 0.);
+                else
+                    c=Color(0., 1.0, 0.);
+                matrixled->draw_pixel_at(halfwidth - sin(-theta) * halfwidth, halfheight - cos(-theta) * halfheight, c);
+            }
+            if (minutes >= 0) {
+                c=Color(1.0, 1.0, 1.0);
+                theta =  minutes * 2 * 3.141 / 60.0;
+                matrixled->line(halfwidth, halfheight, halfwidth - sin(-theta) * halfwidth, halfheight - cos(-theta) * halfheight, c);
+            }
+            if (hours >= 0) {
+                c=Color(1.0, 0, 0);
+                theta = (hours + 0.5)/ 12.0 * 2 * 3.141 ;
+                matrixled->line(halfwidth, halfheight, halfwidth - sin(-theta) * halfwidth * 0.7, halfheight - cos(-theta) * halfheight  * 0.7, c);
+            }
+
+            matrixled->to_addressable_lights(
+                    (light::AddressableLight *) &it, $matrixwidth, $matrixheight,
+                    0,0,
+                    (DisplayOrient) (DisplayOrient::DISPLAY_FLIP_HORIZONTAL
+                    |  DisplayOrient::DISPLAY_ROTATION_270_DEGREES));
+
+
+      # - addressable_lambda:
+      #     name: "Digital Clock and Text"
+      #     update_interval: 200ms
+      #     lambda: |-
+      #       static uint16_t run = 0;
+      #       static auto scrolldisp = new MatrixLedScrollingDisplay();
+      #       if (run == 0) {
+      #         scrolldisp->set_size($matrixwidth * 10, $matrixheight);  // Set the maximum size of the scrollable area here!
+      #       }
+      #       if (run % 128 == 0) { // update clock
+      #           char text[64] = "";
+      #           char timetext[] = "??:¿¿ ";
+      #           scrolldisp->fill(Color(0., 0., 0.));
+      #           if ((id(rtctime).now()).is_valid()){
+      #               id(rtctime).now().strftime(timetext, sizeof(timetext), "%H:%M ");
+      #               if (timetext[0] == '0')
+      #                   timetext[0] = ' ';
+      #          }
+      #          snprintf(&text[0], sizeof(text), "%s %s",
+      #            timetext, id(panel_text).state.c_str());
+      #          //snprintf(&text[0], sizeof(text), "%s %s",
+      #            //timetext, id(extratext).state.c_str());
+
+      #          int x_start=0, y_start=-2;
+      #          int width, height;
+      #          auto c = Color();
+      #          c.raw_32 = current_color.raw_32;
+
+      #          scrolldisp->print(x_start, y_start, id(tinyfont), c, text);
+
+      #          // Wrap the scrolling to the actual size of the text
+      #          scrolldisp->get_text_bounds(x_start, y_start, text, id(tinyfont),
+      #             TextAlign::TOP_LEFT, &x_start, &y_start, &width, &height);
+      #                 scrolldisp->set_wrapped_area(
+      #                   0, 0,
+      #                   width + 2, height + 1);
+
+      #          scrolldisp->dump_buffer();
+      #       }
+      #       scrolldisp->to_addressable_lights(
+      #               (light::AddressableLight *) &it, $matrixwidth, $matrixheight,
+      #               run, 0,
+      #               (DisplayOrient) (DisplayOrient::DISPLAY_FLIP_HORIZONTAL
+      #               |  DisplayOrient::DISPLAY_ROTATION_270_DEGREES)
+      #               );
+      #        run++;
+
+
+      - addressable_lambda:
+          name: "Rainbow Test"
+          update_interval: 1000ms
+          lambda: |-
+            static auto scrolldisp = new MatrixLedScrollingDisplay();
+            scrolldisp->set_size($matrixwidth, $matrixheight);  // Set the maximum size of the scrollable area here!
+
+            for (int x=0; x < $matrixwidth; x++)
+                for (int y=0; y < $matrixheight; y++) {
+
+                  ESPHSVColor hsv;
+                  hsv.value = 255;
+                  hsv.saturation = 240;
+                  hsv.hue = x * 255.0 / $matrixwidth;
+
+                  ESPColor espc = hsv.to_rgb();
+
+                  Color c = Color();
+                  c.raw_32 = espc.raw_32;
+                  scrolldisp->draw_pixel_at(x, y, c);
+                }
+
+            scrolldisp->dump_buffer();
+            scrolldisp->to_addressable_lights(
+                    (light::AddressableLight *) &it, $matrixwidth, $matrixheight, 0, 0,
+                    (DisplayOrient) (DisplayOrient::DISPLAY_FLIP_HORIZONTAL
+                    |  DisplayOrient::DISPLAY_ROTATION_270_DEGREES)
+            );
+
+
+      - addressable_lambda:
+          name: "mario block"
+          update_interval: 200ms
+          lambda: |-
+            static uint16_t run = 0;
+            static auto scrolldisp = new MatrixLedScrollingDisplay();
+            static Animation *img = id(block_animation);
+            if (run == 0) {
+              scrolldisp->set_size($matrixwidth, $matrixheight);  // Set the maximum size of the scrollable area here!
+            }
+              img->next_frame();
+
+              for (int x=0; x < $matrixwidth; x++)
+                for (int y=0; y < $matrixheight; y++)
+                  scrolldisp->draw_pixel_at(x, y, img->get_color_pixel(x, y));
+
+              // scrolldisp->dump_buffer();
+            scrolldisp->to_addressable_lights(
+                    (light::AddressableLight *) &it, $matrixwidth, $matrixheight, 0, 0,
+                    (DisplayOrient) (DisplayOrient::DISPLAY_FLIP_HORIZONTAL
+                    |  DisplayOrient::DISPLAY_ROTATION_270_DEGREES)
+            );
+            run++;
+      - addressable_lambda:
+          name: "mario coin"
+          update_interval: 200ms
+          lambda: |-
+            static uint16_t run = 0;
+            static auto scrolldisp = new MatrixLedScrollingDisplay();
+            static Animation *img = id(coin_animation);
+            if (run == 0) {
+              scrolldisp->set_size($matrixwidth, $matrixheight);  // Set the maximum size of the scrollable area here!
+            }
+              img->next_frame();
+
+              for (int x=0; x < $matrixwidth; x++)
+                for (int y=0; y < $matrixheight; y++)
+                  scrolldisp->draw_pixel_at(x, y, img->get_color_pixel(x, y));
+
+              // scrolldisp->dump_buffer();
+            scrolldisp->to_addressable_lights(
+                    (light::AddressableLight *) &it, $matrixwidth, $matrixheight, 0, 0,
+                    (DisplayOrient) (DisplayOrient::DISPLAY_FLIP_HORIZONTAL
+                    |  DisplayOrient::DISPLAY_ROTATION_270_DEGREES)
+            );
+            run++;
+      - addressable_lambda:
+          name: "Mona"
+          update_interval: 200ms
+          lambda: |-
+            static uint16_t run = 0;
+            static auto scrolldisp = new MatrixLedScrollingDisplay();
+            static Animation *img = id(mona);
+            if (run == 0) {
+              scrolldisp->set_size($matrixwidth, $matrixheight);  // Set the maximum size of the scrollable area here!
+            }
+              img->next_frame();
+
+              for (int x=0; x < $matrixwidth; x++)
+                for (int y=0; y < $matrixheight; y++)
+                  scrolldisp->draw_pixel_at(x, y, img->get_color_pixel(x, y));
+
+              // scrolldisp->dump_buffer();
+            scrolldisp->to_addressable_lights(
+                    (light::AddressableLight *) &it, $matrixwidth, $matrixheight, 0, 0,
+                    (DisplayOrient) (DisplayOrient::DISPLAY_FLIP_HORIZONTAL
+                    |  DisplayOrient::DISPLAY_ROTATION_270_DEGREES)
+            );
+            run++;
+      - addressable_lambda:
+          name: "mario goomba"
+          update_interval: 200ms
+          lambda: |-
+            static uint16_t run = 0;
+            static auto scrolldisp = new MatrixLedScrollingDisplay();
+            static Animation *img = id(goomba_animation);
+            if (run == 0) {
+              scrolldisp->set_size($matrixwidth, $matrixheight);  // Set the maximum size of the scrollable area here!
+            }
+              img->next_frame();
+
+              for (int x=0; x < $matrixwidth; x++)
+                for (int y=0; y < $matrixheight; y++)
+                  scrolldisp->draw_pixel_at(x, y, img->get_color_pixel(x, y));
+
+              // scrolldisp->dump_buffer();
+            scrolldisp->to_addressable_lights(
+                    (light::AddressableLight *) &it, $matrixwidth, $matrixheight, 0, 0,
+                    (DisplayOrient) (DisplayOrient::DISPLAY_FLIP_HORIZONTAL
+                    |  DisplayOrient::DISPLAY_ROTATION_270_DEGREES)
+            );
+            run++;
+      - addressable_lambda:
+          name: "mario mushroom"
+          update_interval: 200ms
+          lambda: |-
+            static uint16_t run = 0;
+            static auto scrolldisp = new MatrixLedScrollingDisplay();
+            static Animation *img = id(mushroom_animation);
+            if (run == 0) {
+              scrolldisp->set_size($matrixwidth, $matrixheight);  // Set the maximum size of the scrollable area here!
+            }
+            if (run % 6 == 0) { // update frame
+              img->next_frame();
+
+              for (int x=0; x < $matrixwidth; x++)
+                for (int y=0; y < $matrixheight; y++)
+                  scrolldisp->draw_pixel_at(x, y, img->get_color_pixel(x, y));
+
+              // scrolldisp->dump_buffer();
+            }
+            scrolldisp->to_addressable_lights(
+                    (light::AddressableLight *) &it, $matrixwidth, $matrixheight, 0, 0,
+                    (DisplayOrient) (DisplayOrient::DISPLAY_FLIP_HORIZONTAL
+                    |  DisplayOrient::DISPLAY_ROTATION_270_DEGREES)
+            );
+            run++;
+      - addressable_lambda:
+          name: "zelda fire"
+          update_interval: 200ms
+          lambda: |-
+            static uint16_t run = 0;
+            static auto scrolldisp = new MatrixLedScrollingDisplay();
+            static Animation *img = id(fire_animation);
+            if (run == 0) {
+              scrolldisp->set_size($matrixwidth, $matrixheight);  // Set the maximum size of the scrollable area here!
+            }
+            if (run % 6 == 0) { // update frame
+              img->next_frame();
+
+              for (int x=0; x < $matrixwidth; x++)
+                for (int y=0; y < $matrixheight; y++)
+                  scrolldisp->draw_pixel_at(x, y, img->get_color_pixel(x, y));
+
+              // scrolldisp->dump_buffer();
+            }
+            scrolldisp->to_addressable_lights(
+                    (light::AddressableLight *) &it, $matrixwidth, $matrixheight, 0, 0,
+                    (DisplayOrient) (DisplayOrient::DISPLAY_FLIP_HORIZONTAL
+                    |  DisplayOrient::DISPLAY_ROTATION_270_DEGREES)
+            );
+            run++;
+      - addressable_lambda:
+          name: "skeleton"
+          update_interval: 200ms
+          lambda: |-
+            static uint16_t run = 0;
+            static auto scrolldisp = new MatrixLedScrollingDisplay();
+            static Animation *img = id(skeleton_animation);
+            if (run == 0) {
+              scrolldisp->set_size($matrixwidth, $matrixheight);  // Set the maximum size of the scrollable area here!
+            }
+            if (run % 6 == 0) { // update frame
+              img->next_frame();
+
+              for (int x=0; x < $matrixwidth; x++)
+                for (int y=0; y < $matrixheight; y++)
+                  scrolldisp->draw_pixel_at(x, y, img->get_color_pixel(x, y));
+
+              // scrolldisp->dump_buffer();
+            }
+            scrolldisp->to_addressable_lights(
+                    (light::AddressableLight *) &it, $matrixwidth, $matrixheight, 0, 0,
+                    (DisplayOrient) (DisplayOrient::DISPLAY_FLIP_HORIZONTAL
+                    |  DisplayOrient::DISPLAY_ROTATION_270_DEGREES)
+            );
+            run++;
+      - addressable_lambda:
+          name: "boss key"
+          update_interval: 200ms
+          lambda: |-
+            static uint16_t run = 0;
+            static auto scrolldisp = new MatrixLedScrollingDisplay();
+            static Animation *img = id(boss_key_animation);
+            if (run == 0) {
+              scrolldisp->set_size($matrixwidth, $matrixheight);  // Set the maximum size of the scrollable area here!
+            }
+            if (run % 6 == 0) { // update frame
+              img->next_frame();
+
+              for (int x=0; x < $matrixwidth; x++)
+                for (int y=0; y < $matrixheight; y++)
+                  scrolldisp->draw_pixel_at(x, y, img->get_color_pixel(x, y));
+
+              // scrolldisp->dump_buffer();
+            }
+            scrolldisp->to_addressable_lights(
+                    (light::AddressableLight *) &it, $matrixwidth, $matrixheight, 0, 0,
+                    (DisplayOrient) (DisplayOrient::DISPLAY_FLIP_HORIZONTAL
+                    |  DisplayOrient::DISPLAY_ROTATION_270_DEGREES)
+            );
+            run++;
+      - addressable_lambda:
+          name: "undertale"
+          update_interval: 200ms
+          lambda: |-
+            static uint16_t run = 0;
+            static auto scrolldisp = new MatrixLedScrollingDisplay();
+            static Animation *img = id(frisk);
+            if (run == 0) {
+              scrolldisp->set_size($matrixwidth, $matrixheight);  // Set the maximum size of the scrollable area here!
+            }
+            if (run % 6 == 0) { // update frame
+              img->next_frame();
+
+              for (int x=0; x < $matrixwidth; x++)
+                for (int y=0; y < $matrixheight; y++)
+                  scrolldisp->draw_pixel_at(x, y, img->get_color_pixel(x, y));
+
+              // scrolldisp->dump_buffer();
+            }
+            scrolldisp->to_addressable_lights(
+                    (light::AddressableLight *) &it, $matrixwidth, $matrixheight, 0, 0,
+                    (DisplayOrient) (DisplayOrient::DISPLAY_FLIP_HORIZONTAL
+                    |  DisplayOrient::DISPLAY_ROTATION_270_DEGREES)
+            );
+            run++;
+
+
+      - addressable_lambda:
+          name: "color_blocks"
+          update_interval: 200ms
+          lambda: |-
+            static uint16_t run = 0;
+            static auto scrolldisp = new MatrixLedScrollingDisplay();
+            static Animation *img = id(color_blocks);
+            if (run == 0) {
+              scrolldisp->set_size($matrixwidth, $matrixheight);  // Set the maximum size of the scrollable area here!
+            }
+            img->next_frame();
+
+            for (int x=0; x < $matrixwidth; x++)
+              for (int y=0; y < $matrixheight; y++)
+                scrolldisp->draw_pixel_at(x, y, img->get_color_pixel(x, y));
+            scrolldisp->to_addressable_lights(
+                    (light::AddressableLight *) &it, $matrixwidth, $matrixheight, 0, 0,
+                    (DisplayOrient) (DisplayOrient::DISPLAY_FLIP_HORIZONTAL
+                    |  DisplayOrient::DISPLAY_ROTATION_270_DEGREES)
+            );
+            run++;
+
+      - addressable_lambda:
+          name: "coffee"
+          update_interval: 200ms
+          lambda: |-
+            static uint16_t run = 0;
+            static auto scrolldisp = new MatrixLedScrollingDisplay();
+            static Animation *img = id(coffee);
+            if (run == 0) {
+              scrolldisp->set_size($matrixwidth, $matrixheight);  // Set the maximum size of the scrollable area here!
+            }
+            img->next_frame();
+
+            for (int x=0; x < $matrixwidth; x++)
+              for (int y=0; y < $matrixheight; y++)
+                scrolldisp->draw_pixel_at(x, y, img->get_color_pixel(x, y));
+            scrolldisp->to_addressable_lights(
+                    (light::AddressableLight *) &it, $matrixwidth, $matrixheight, 0, 0,
+                    (DisplayOrient) (DisplayOrient::DISPLAY_FLIP_HORIZONTAL
+                    |  DisplayOrient::DISPLAY_ROTATION_270_DEGREES)
+            );
+            run++;
+
+
+      - addressable_lambda:
+          name: "face"
+          update_interval: 200ms
+          lambda: |-
+            static uint16_t run = 0;
+            static auto scrolldisp = new MatrixLedScrollingDisplay();
+            static Animation *img = id(face);
+            if (run == 0) {
+              scrolldisp->set_size($matrixwidth, $matrixheight);  // Set the maximum size of the scrollable area here!
+            }
+            img->next_frame();
+
+            for (int x=0; x < $matrixwidth; x++)
+              for (int y=0; y < $matrixheight; y++)
+                scrolldisp->draw_pixel_at(x, y, img->get_color_pixel(x, y));
+            scrolldisp->to_addressable_lights(
+                    (light::AddressableLight *) &it, $matrixwidth, $matrixheight, 0, 0,
+                    (DisplayOrient) (DisplayOrient::DISPLAY_FLIP_HORIZONTAL
+                    |  DisplayOrient::DISPLAY_ROTATION_270_DEGREES)
+            );
+            run++;
+
+      - addressable_lambda:
+          name: "fire"
+          update_interval: 200ms
+          lambda: |-
+            static uint16_t run = 0;
+            static auto scrolldisp = new MatrixLedScrollingDisplay();
+            static Animation *img = id(fire);
+            if (run == 0) {
+              scrolldisp->set_size($matrixwidth, $matrixheight);  // Set the maximum size of the scrollable area here!
+            }
+            img->next_frame();
+
+            for (int x=0; x < $matrixwidth; x++)
+              for (int y=0; y < $matrixheight; y++)
+                scrolldisp->draw_pixel_at(x, y, img->get_color_pixel(x, y));
+            scrolldisp->to_addressable_lights(
+                    (light::AddressableLight *) &it, $matrixwidth, $matrixheight, 0, 0,
+                    (DisplayOrient) (DisplayOrient::DISPLAY_FLIP_HORIZONTAL
+                    |  DisplayOrient::DISPLAY_ROTATION_270_DEGREES)
+            );
+            run++;
+
+      - addressable_lambda:
+          name: "fish"
+          update_interval: 200ms
+          lambda: |-
+            static uint16_t run = 0;
+            static auto scrolldisp = new MatrixLedScrollingDisplay();
+            static Animation *img = id(fish);
+            if (run == 0) {
+              scrolldisp->set_size($matrixwidth, $matrixheight);  // Set the maximum size of the scrollable area here!
+            }
+            img->next_frame();
+
+            for (int x=0; x < $matrixwidth; x++)
+              for (int y=0; y < $matrixheight; y++)
+                scrolldisp->draw_pixel_at(x, y, img->get_color_pixel(x, y));
+            scrolldisp->to_addressable_lights(
+                    (light::AddressableLight *) &it, $matrixwidth, $matrixheight, 0, 0,
+                    (DisplayOrient) (DisplayOrient::DISPLAY_FLIP_HORIZONTAL
+                    |  DisplayOrient::DISPLAY_ROTATION_270_DEGREES)
+            );
+            run++;
+
+
+      - addressable_lambda:
+          name: "octorok"
+          update_interval: 200ms
+          lambda: |-
+            static uint16_t run = 0;
+            static auto scrolldisp = new MatrixLedScrollingDisplay();
+            static Animation *img = id(octorok);
+            if (run == 0) {
+              scrolldisp->set_size($matrixwidth, $matrixheight);  // Set the maximum size of the scrollable area here!
+            }
+            img->next_frame();
+
+            for (int x=0; x < $matrixwidth; x++)
+              for (int y=0; y < $matrixheight; y++)
+                scrolldisp->draw_pixel_at(x, y, img->get_color_pixel(x, y));
+            scrolldisp->to_addressable_lights(
+                    (light::AddressableLight *) &it, $matrixwidth, $matrixheight, 0, 0,
+                    (DisplayOrient) (DisplayOrient::DISPLAY_FLIP_HORIZONTAL
+                    |  DisplayOrient::DISPLAY_ROTATION_270_DEGREES)
+            );
+            run++;
+
+
+      - addressable_lambda:
+          name: "water"
+          update_interval: 200ms
+          lambda: |-
+            static uint16_t run = 0;
+            static auto scrolldisp = new MatrixLedScrollingDisplay();
+            static Animation *img = id(water);
+            if (run == 0) {
+              scrolldisp->set_size($matrixwidth, $matrixheight);  // Set the maximum size of the scrollable area here!
+            }
+            img->next_frame();
+
+            for (int x=0; x < $matrixwidth; x++)
+              for (int y=0; y < $matrixheight; y++)
+                scrolldisp->draw_pixel_at(x, y, img->get_color_pixel(x, y));
+            scrolldisp->to_addressable_lights(
+                    (light::AddressableLight *) &it, $matrixwidth, $matrixheight, 0, 0,
+                    (DisplayOrient) (DisplayOrient::DISPLAY_FLIP_HORIZONTAL
+                    |  DisplayOrient::DISPLAY_ROTATION_270_DEGREES)
+            );
+            run++;
+
+
+      - addressable_lambda:
+          name: "zelda_walk"
+          update_interval: 200ms
+          lambda: |-
+            static uint16_t run = 0;
+            static auto scrolldisp = new MatrixLedScrollingDisplay();
+            static Animation *img = id(zelda_walk);
+            if (run == 0) {
+              scrolldisp->set_size($matrixwidth, $matrixheight);  // Set the maximum size of the scrollable area here!
+            }
+            img->next_frame();
+
+            for (int x=0; x < $matrixwidth; x++)
+              for (int y=0; y < $matrixheight; y++)
+                scrolldisp->draw_pixel_at(x, y, img->get_color_pixel(x, y));
+            scrolldisp->to_addressable_lights(
+                    (light::AddressableLight *) &it, $matrixwidth, $matrixheight, 0, 0,
+                    (DisplayOrient) (DisplayOrient::DISPLAY_FLIP_HORIZONTAL
+                    |  DisplayOrient::DISPLAY_ROTATION_270_DEGREES)
+            );
+            run++;
+
+
+
+display:
+

@@ -1,0 +1,138 @@
+substitutions:
+  # UNIQUE NAME FOR THE DEVICE
+  deviceName: knob_screen
+  deviceUpper: Knob Screen
+
+  # ENTITY MAPPING FOR THE DIFFERENT FUNCTIONS
+  mediaPlayer: living_room_sonos # ID OF MEDIA PLAYER IN HA
+  lightGroup: living_room_hue # ID OF LIGHT GROUP IN HA
+  climate: zen_thermostat # ID OF THERMOSTAT IN HA
+
+   # CUSTOM OPTIONS
+  alertTimeout: 10s # NUMBER OF SECONDS THE ALERTS WILL BE SHOWN
+  climateLower: '10' # CLIMATE LOWER LIMIT
+  climateUpper: '30' # CLIMATE UPPER LIMIT
+  defaultScreen: Brightness # VALUES COULD BE Media, Brightness, Warmth or Climate
+
+  # SWITCH MAPPING. SELECT THE SWITCH FOR EACH ACTION
+  switchMenu: ${sideSwitch}
+  switchAction: ${encoderSwitch}
+
+  # WIFI AND OTHER CREDENTIALS. USE SECRETS WHERE POSSIBLE
+  wifiSSID: !secret wifi_ssid
+  wifiPass: !secret wifi_pw
+
+  # ESP DECLARATION
+  boardPlatform: ESP8266
+  boardName: d1_mini
+
+  # PIN MAPPING. DEFAULTS TO ioios.io PITHY AND COUNTER DEVICES
+  encoderPinA: D5
+  encoderPinB: D6
+  encoderSwitch: D7
+  i2cData: D4
+  i2cClock: D3
+  # pirSensor: D1
+  sideSwitch: TX
+  neoPixels: RX
+
+  # EXTRA SWITCHES
+  # switchExtra: D4
+
+###############################################################################
+# WHOA WHERE ARE YOU GOING? GO STEADY BEYOND HERE, THIS IS THE BREAKABLE BIT! #
+###############################################################################
+esphome:
+  name: ${deviceName}
+  platform: ${boardPlatform}
+  board: ${boardName}
+
+wifi:
+  networks:
+    - ssid: !secret wifi_ssid
+      password: !secret wifi_pw
+      bssid: F8:BC:0E:8C:B3:86
+    - ssid: !secret wifi_ssid
+      password: !secret wifi_pw
+      bssid: F8:BC:0E:8C:B3:89
+    - ssid: !secret wifi_ssid
+      password: !secret wifi_pw
+      bssid: F8:BC:0E:8C:B3:83
+    - ssid: !secret wifi_ssid
+      password: !secret wifi_pw
+      bssid: 6C:AE:F6:87:FF:03
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+
+i2c:
+  sda: ${i2cData}
+  scl: ${i2cClock}
+  scan: True
+  frequency: 10kHz
+  id: bus_a
+
+
+font:
+  - file: "fonts/LiberationSans-Regular.ttf"
+    id: title_font
+    size: 12
+    glyphs: ":/HTPS"
+  - file: "fonts/LiberationSans-Bold.ttf"
+    id: title_font_bold
+    size: 16
+    glyphs: "ios."
+  - file: "fonts/Paul.ttf"
+    id: small_font
+    size: 16
+    glyphs: ":!0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ."
+  - file: "fonts/Paul.ttf"
+    id: standard_font
+    size: 26
+    glyphs: ":/&!°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ."
+
+image:
+  - file: "images/alert.png"
+    id: alert_image
+    resize: 48x48
+  - file: "images/dinner.png"
+    id: dinner_image
+    resize: 48x48
+  - file: "images/door.png"
+    id: door_image
+    resize: 34x48
+  - file: "images/warmth.png"
+    id: warmth_image
+    resize: 16x16
+  - file: "images/brightness.png"
+    id: brightness_image
+    resize: 16x16
+  - file: "images/ioios.png"
+    id: ioios_image
+    resize: 48x48
+  - file: "images/ha.png"
+    id: ha_image
+    resize: 48x48
+
+display:
+  - platform: ssd1306_i2c
+    model: "SH1106 128x64"
+    address: 0x3C
+    update_interval: 0.1s
+    id: i2cDisplay
+    pages:
+      - id: pageMain
+        lambda: |-
+          it.printf(12, 2, id(title_font), TextAlign::TOP_LEFT, "HTTPS://");
+          it.printf(124, 0, id(title_font_bold), TextAlign::TOP_RIGHT, "ioios.io");
+
+          it.image(8, 16, id(ha_image));
+          it.image(72, 16, id(ioios_image));
+

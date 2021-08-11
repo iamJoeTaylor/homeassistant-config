@@ -113,13 +113,13 @@ google:
   client_id: !secret google_client_id
   client_secret: !secret google_client_secret
 
-device_tracker:
-  - platform: eero_tracker
-    consider_home: 300
-    new_device_defaults:
-        track_new_devices: true
-    interval_seconds: 20
-  - platform: bluetooth_tracker
+# device_tracker:
+#   - platform: eero_tracker
+#     consider_home: 300
+#     new_device_defaults:
+#         track_new_devices: true
+#     interval_seconds: 20
+#   - platform: bluetooth_tracker
 
 person:
   - name: Joe
@@ -130,14 +130,6 @@ person:
     id: kim
     device_trackers:
       - device_tracker.meow_3
-
-dyson:
-  language: US
-  username: !secret dyson_username
-  password: !secret dyson_password
-  devices:
-    - device_id: !secret dyson_device_id
-      device_ip: !secret dyson_device_ip
 
 # Simple Service Discovery Protocol
 ssdp:
@@ -179,23 +171,12 @@ sensor: !include sensor.yaml
 
 binary_sensor: !include binary_sensors.yaml
 
-speedtestdotnet:
-  scan_interval:
-    minutes: 30
-  monitored_conditions:
-    - ping
-    - download
-    - upload
-
 circadian_lighting:
 
 switch:
   - platform: circadian_lighting
     name: Lights Circadian
     lights_ct:
-      - light.living_room_hue
-      - light.hall_hue
-    lights_brightness:
       - light.living_room_hue
       - light.hall_hue
     min_brightness: 20
