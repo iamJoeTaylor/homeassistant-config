@@ -22,10 +22,15 @@
           show_legend: false
           color: '#e74c3c'
       font_size: 75
+      font_size_header: 12
       line_color: '#e74c3c'
       line_width: 2
       name: Temp
       type: 'custom:mini-graph-card'
+      style: |
+        ha-card {
+          --mdc-icon-size: 17px;
+        }
 
 - type: horizontal-stack
   cards:
@@ -51,46 +56,50 @@
           show_legend: false
           color: '#46AEDD'
       font_size: 75
+      font_size_header: 12
       icon: 'mdi:water-percent'
       line_color: var(--accent-color)
       line_width: 2
       name: Humidity
       type: 'custom:mini-graph-card'
-
-- type: horizontal-stack
-  cards:
-    - entities:
-        - entity: sensor.pure_cool_link_air_quality
-          index: 0
-      font_size: 75
-      icon: 'mdi:chart-line'
-      line_color: green
-      line_width: 2
-      name: AQI
-      type: 'custom:mini-graph-card'
+      style: |
+        ha-card {
+          --mdc-icon-size: 17px;
+        }
 
 - type: horizontal-stack
   cards:
     - entities:
         - entity: sensor.joes_iphone_steps
           index: 0
-      font_size: 75
+      font_size: 60
+      font_size_header: 10
       line_color: var(--accent-color)
       line_width: 8
-      name: Joe's Steps
+      name: Joe
       type: 'custom:mini-graph-card'
+      style: |
+        ha-card {
+          --mdc-icon-size: 12px;
+        }
     - entities:
         - entity: sensor.meow_steps
           index: 0
-      font_size: 75
+      font_size: 60
+      font_size_header: 10
       line_color: '#e74c3c'
       line_width: 8
-      name: Kim's Steps
+      name: Kim
       type: 'custom:mini-graph-card'
+      style: |
+        ha-card {
+          --mdc-icon-size: 12px;
+        }
     - entities:
-        - entity: sensor.u_s_air_quality_index
+        - entity: sensor.purpleair
           index: 0
-      font_size: 75
+      font_size: 60
+      font_size_header: 10
       icon: 'mdi:chart-line'
       color_thresholds:
         - value: 50
@@ -100,8 +109,12 @@
         - value: 150
           color: "#c0392b"
       line_width: 8
-      name: Berkeley AQI
+      name: Berk
       type: 'custom:mini-graph-card'
+      style: |
+        ha-card {
+          --mdc-icon-size: 12px;
+        }
 
 
 - type: vertical-stack
@@ -109,7 +122,7 @@
     - show_header_toggle: false
       type: entities
       entities:
-        - entity: light.joe_neopixel_panel_light
+        - entity: light.fireplace
           hide_when_off: true
           name: Fireplace
           toggle: true
@@ -136,3 +149,4 @@
               icon: mdi:skip-next-outline
               service:
                 name: script.neopixel_up
+

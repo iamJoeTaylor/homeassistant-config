@@ -2,7 +2,7 @@
   trigger:
   - platform: state
     entity_id:
-    - binary_sensor.sonoff_4ch_status
+      - binary_sensor.sonoff_4ch_status
     to: 'off'
     for:
       minutes: 5
@@ -23,7 +23,7 @@
   trigger:
   - platform: state
     entity_id:
-    - switch.sonoff_power_on_off
+      - switch.sonoff_power_on_off
     to: 'off'
     for:
       minutes: 2
@@ -31,17 +31,17 @@
   - service: switch.turn_on
     entity_id: switch.sonoff_power_on_off
 
-- alias: Notify if sprinklers left on for 12 minutes
+- alias: Notify if sprinklers left on for 10 minutes
   trigger:
   - platform: state
     entity_id:
-    - switch.sonoff_4ch_relay_1
-    - switch.sonoff_4ch_relay_2
-    - switch.sonoff_4ch_relay_3
-    - switch.sonoff_4ch_relay_4
+      - switch.sonoff_4ch_relay_1
+      - switch.sonoff_4ch_relay_2
+      - switch.sonoff_4ch_relay_3
+      - switch.sonoff_4ch_relay_4
     to: 'on'
     for:
-      minutes: 12
+      minutes: 10
   action:
   - service: notify.mobile_app_joes_iphone
     data:
@@ -73,34 +73,34 @@
     entity_id: light.hue_porch
     service: light.turn_off
 
-- alias: Water Frontyard Morning
-  trigger:
-    - platform: time
-      at: '04:00:00'
-  conditions:
-    - condition: template
-      value_template: "{{now().strftime('%j')|int % 2 == 0}}"
-    - condition: state
-      entity_id: "input_boolean.skip_watering"
-      state: 'off'
-    - condition: state
-      entity_id: "input_boolean.turn_off_watering"
-      state: 'off'
-  action:
-    - service: script.sprinkler_water_front
+# - alias: Water Frontyard Morning
+#   trigger:
+#     - platform: time
+#       at: '04:00:00'
+#   conditions:
+#     - condition: template
+#       value_template: "{{now().strftime('%j')|int % 2 == 0}}"
+#     - condition: state
+#       entity_id: "input_boolean.skip_watering"
+#       state: 'off'
+#     - condition: state
+#       entity_id: "input_boolean.turn_off_watering"
+#       state: 'off'
+#   action:
+#     - service: script.sprinkler_water_front
 
-- alias: Water Frontyard Afternoon
-  trigger:
-    - platform: time
-      at: '14:00:00'
-  conditions:
-    - condition: template
-      value_template: "{{now().strftime('%j')|int % 2 == 0}}"
-    - condition: state
-      entity_id: "input_boolean.skip_watering"
-      state: 'off'
-    - condition: state
-      entity_id: "input_boolean.turn_off_watering"
-      state: 'off'
-  action:
-    - service: script.sprinkler_water_front
+# - alias: Water Frontyard Afternoon
+#   trigger:
+#     - platform: time
+#       at: '14:00:00'
+#   conditions:
+#     - condition: template
+#       value_template: "{{now().strftime('%j')|int % 2 == 0}}"
+#     - condition: state
+#       entity_id: "input_boolean.skip_watering"
+#       state: 'off'
+#     - condition: state
+#       entity_id: "input_boolean.turn_off_watering"
+#       state: 'off'
+#   action:
+#     - service: script.sprinkler_water_front

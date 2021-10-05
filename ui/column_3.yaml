@@ -3,24 +3,34 @@
     - entities:
         - entity: sensor.pi_temperature
           index: 0
-      font_size: 75
+      font_size: 60
+      font_size_header: 12
       hours_to_show: 3
       line_color: green
-      line_width: 8
+      line_width: 6
       name: π Temp
       points_per_hour: 10
       symbol: Mb/s
       type: 'custom:mini-graph-card'
+      style: |
+        ha-card {
+          --mdc-icon-size: 17px;
+        }
     - entities:
         - entity: sensor.processor_use
           index: 0
-      font_size: 75
+      font_size: 60
+      font_size_header: 12
       hours_to_show: 3
       line_color: orange
-      line_width: 8
+      line_width: 6
       name: π CPU
       points_per_hour: 10
       type: 'custom:mini-graph-card'
+      style: |
+        ha-card {
+          --mdc-icon-size: 17px;
+        }
 
 - show_header_toggle: false
   entities:

@@ -30,9 +30,8 @@
 
   value_template: >
     {% macro calcAQI(Cp, Ih, Il, BPh, BPl) -%}
-      {{ (((Ih - Il)/(BPh - BPl)) * (Cp - BPl) + Il)|round }}   
+      {{ (((Ih - Il)/(BPh - BPl)) * (Cp - BPl) + Il)|round }}
     {%- endmacro %}
-    # Use the 10m average of PM25 and assign it to variable
     {% set pm25 = value_json.results[0].PM2_5Value %}
     {% if (pm25|float) > 1000 %}
       invalid
@@ -249,4 +248,4 @@
 # - platform: template
 #   sensors:
 #     neopixel_panel_effect_list:
-#       value_template: "{{state_attr('light.joe_neopixel_panel_light', 'effect_list')|join(',')}}"
+#       value_template: "{{state_attr('light.fireplace', 'effect_list')|join(',')}}"

@@ -19,7 +19,7 @@
     state: "{{state_attr('light.nanoleaf', 'effect_list') | join(',')}}"
 - sensor:
   - name: "NeoPixel Panel Entity List"
-    state: "{{state_attr('light.joe_neopixel_panel_light', 'effect_list') | join(',')}}"
+    state: "{{state_attr('light.fireplace', 'effect_list') | join(',')}}"
 
 - sensor:
   - unique_id: sprinkler_status

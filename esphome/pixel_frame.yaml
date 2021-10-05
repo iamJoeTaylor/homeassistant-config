@@ -8,38 +8,43 @@ substitutions:
   matrixheight: "16" # in pix
   scrollinterval: "0.2" # in seconds
   xscrollpadding: "4" # in pix
+  animation_1: "matrix"
+  animation_2: "mona"
+  animation_3: "goomba"
+  animation_4: "block"
+  animation_5: "coin"
+  animation_6: "mushroom"
+  animation_7: "zelda_fire"
+  animation_8: "zelda_skeleton"
+  animation_9: "boss_key"
+  animation_10: "frisk"
+  animation_11: "blocks"
+  animation_12: "coffee"
+  animation_13: "face"
+  animation_14: "fire"
+  animation_15: "fish"
+  animation_16: "octorok"
+  animation_17: "water"
+  animation_18: "zelda_walk"
 
 esphome:
   name: $devicename
   platform: ESP8266
   board: d1_mini
-  includes:
-    - my_matrixled_scrolling_display.h
   on_boot:
     priority: -10
     then: # stop the flickering
       - lambda: |-
             fastled_base_fastledlightoutput->get_controller()->setDither(0);
-      # - light.turn_on:
-      #       id: mylight
-      #       brightness: 100%
-      #       effect: "mario block"
+      - light.turn_on:
+            id: mylight
+            brightness: 100%
+            effect: $animation_5
 
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_pw
   fast_connect: true
-
-# mqtt:
-#   id: mqtt_client
-#   broker: 192.168.7.171
-
-
-# text_sensor:
-#   - platform: mqtt_subscribe
-#     name: "Text"
-#     id: extratext
-#     topic: text/text
 
 text_sensor:
   - platform: homeassistant
@@ -74,63 +79,202 @@ light:
     rgb_order: GRB
     name: "$devicename Light"
     id: mylight
-    # color_correct: [40%, 40%, 40%]
-    # effects:
-    #   - lambda:
-    #       name: "goomba_animation"
-    #       update_interval: 500ms
-    #       lambda: |-
-    #         static uint16_t run = 0;
-    #         if (run == 0)
-    #           id(matrix_display).show_page(id(page1));
-    #         run++;
-    #   - lambda:
-    #       name: "2"
-    #       update_interval: 500ms
-    #       lambda: |-
-    #         static uint16_t run = 0;
-    #         if (run == 0)
-    #           id(matrix_display).show_page(id(page2));
-    #         run++;
+    default_transition_length: 0s
+    color_correct: [50%, 50%, 50%]
+    on_turn_on:
+      - light.turn_on:
+          id: mylight
+          effect: $animation_7
+    effects:
+      - lambda:
+          name: $animation_1
+          update_interval: 1s
+          lambda: |-
+            id(my_select).make_call().set_option("$animation_1").perform();
+      - lambda:
+          name: $animation_2
+          update_interval: 1s
+          lambda: |-
+            id(my_select).make_call().set_option("$animation_2").perform();
+      - lambda:
+          name: $animation_3
+          update_interval: 1s
+          lambda: |-
+            id(my_select).make_call().set_option("$animation_3").perform();
+      - lambda:
+          name: $animation_4
+          update_interval: 1s
+          lambda: |-
+            id(my_select).make_call().set_option("$animation_4").perform();
+      - lambda:
+          name: $animation_5
+          update_interval: 1s
+          lambda: |-
+            id(my_select).make_call().set_option("$animation_5").perform();
+      - lambda:
+          name: $animation_6
+          update_interval: 1s
+          lambda: |-
+            id(my_select).make_call().set_option("$animation_6").perform();
+      - lambda:
+          name: $animation_7
+          update_interval: 1s
+          lambda: |-
+            id(my_select).make_call().set_option("$animation_7").perform();
+      - lambda:
+          name: $animation_8
+          update_interval: 1s
+          lambda: |-
+            id(my_select).make_call().set_option("$animation_8").perform();
+      - lambda:
+          name: $animation_9
+          update_interval: 1s
+          lambda: |-
+            id(my_select).make_call().set_option("$animation_9").perform();
+      - lambda:
+          name: $animation_10
+          update_interval: 1s
+          lambda: |-
+            id(my_select).make_call().set_option("$animation_10").perform();
+      - lambda:
+          name: $animation_11
+          update_interval: 1s
+          lambda: |-
+            id(my_select).make_call().set_option("$animation_11").perform();
+      - lambda:
+          name: $animation_12
+          update_interval: 1s
+          lambda: |-
+            id(my_select).make_call().set_option("$animation_12").perform();
+      - lambda:
+          name: $animation_13
+          update_interval: 1s
+          lambda: |-
+            id(my_select).make_call().set_option("$animation_13").perform();
+      - lambda:
+          name: $animation_14
+          update_interval: 1s
+          lambda: |-
+            id(my_select).make_call().set_option("$animation_14").perform();
+      - lambda:
+          name: $animation_15
+          update_interval: 1s
+          lambda: |-
+            id(my_select).make_call().set_option("$animation_15").perform();
+      - lambda:
+          name: $animation_16
+          update_interval: 1s
+          lambda: |-
+            id(my_select).make_call().set_option("$animation_16").perform();
+      - lambda:
+          name: $animation_17
+          update_interval: 1s
+          lambda: |-
+            id(my_select).make_call().set_option("$animation_17").perform();
+      - lambda:
+          name: $animation_18
+          update_interval: 1s
+          lambda: |-
+            id(my_select).make_call().set_option("$animation_18").perform();
 
-      # - addressable_lambda:
-      #     name: "goomba_animation"
-      #     update_interval: 200ms
-      #     lambda: |-
-      #       id(matrix_display).fill(COLOR_OFF);
-      #       id(goomba_animation).next_frame();
-      #       id(matrix_display).image(0, 0, id(goomba_animation), COLOR_ON, COLOR_OFF);
-      # - addressable_lambda:
-      #     name: "block_animation"
-      #     update_interval: 200ms
-      #     lambda: |-
-      #       id(matrix_display).fill(COLOR_OFF);
-      #       id(block_animation).next_frame();
-      #       id(matrix_display).image(0, 0, id(block_animation), COLOR_ON, COLOR_OFF);
-   
 animation:
-  - file: "matrix.gif"
-    id: matrix_animation
+  - file: "$animation_1.gif"
+    id: $animation_1
     type: RGB24
-  - file: "mona.png"
-    id: mona
+    resize: 16x16
+  - file: "$animation_2.png"
+    id: $animation_2
     type: RGB24
-  - file: "goomba.gif"
-    id: goomba_animation
+    resize: 16x16
+  - file: "$animation_3.gif"
+    id: $animation_3
     type: RGB24
-  - file: "block.gif"
-    id: block_animation
+    resize: 16x16
+  - file: "$animation_4.gif"
+    id: $animation_4
     type: RGB24
+    resize: 16x16
+  - file: "$animation_5.gif"
+    id: $animation_5
+    type: RGB24
+    resize: 16x16
+  - file: "$animation_6.png"
+    id: $animation_6
+    type: RGB24
+    resize: 16x16
+  - file: "$animation_7.gif"
+    id: $animation_7
+    type: RGB24
+    resize: 16x16
+  - file: "$animation_8.gif"
+    id: $animation_8
+    type: RGB24
+    resize: 16x16
+  - file: "$animation_9.png"
+    id: $animation_9
+    type: RGB24
+    resize: 16x16
+  - file: "$animation_10.png"
+    id: $animation_10
+    type: RGB24
+    resize: 16x16
+  - file: "$animation_11.gif"
+    id: $animation_11
+    type: RGB24
+    resize: 16x16
+  - file: "$animation_12.gif"
+    id: $animation_12
+    type: RGB24
+    resize: 16x16
+  - file: "$animation_13.gif"
+    id: $animation_13
+    type: RGB24
+    resize: 16x16
+  - file: "$animation_14.gif"
+    id: $animation_14
+    type: RGB24
+    resize: 16x16
+  - file: "$animation_15.gif"
+    id: $animation_15
+    type: RGB24
+    resize: 16x16
+  - file: "$animation_16.gif"
+    id: $animation_16
+    type: RGB24
+    resize: 16x16
+  - file: "$animation_17.gif"
+    id: $animation_17
+    type: RGB24
+    resize: 16x16
+  - file: "$animation_18.gif"
+    id: $animation_18
+    type: RGB24
+    resize: 16x16
 
-interval:
-  - interval: 500ms
-    then:
-      lambda: |-
-        id(current_animation).next_frame();
-
-globals:
-   - id: current_animation
-     type: Animation
+select:
+    - name: Pixel Frame Select
+      id: my_select
+      platform: template
+      optimistic: true
+      options:
+        - $animation_1
+        - $animation_2
+        - $animation_3
+        - $animation_4
+        - $animation_5
+        - $animation_6
+        - $animation_7
+        - $animation_8
+        - $animation_9
+        - $animation_10
+        - $animation_11
+        - $animation_12
+        - $animation_13
+        - $animation_14
+        - $animation_15
+        - $animation_16
+        - $animation_17
+        - $animation_18
 
 display:
   - platform: addressable_light
@@ -144,31 +288,59 @@ display:
         return (y * 16) + (15 - x);
       }
       return (y * 16) + x;
-    pages:
-      - id: page1
-        lambda: |-
-          id(current_animation) = id(block_animation);
-          it.image(0, 0, id(block_animation), COLOR_ON, COLOR_OFF);
-      - id: page2
-        lambda: |-
-          id(current_animation) = id(goomba_animation);
-          it.image(0, 0, id(goomba_animation), COLOR_ON, COLOR_OFF);
-    # update_interval: 200ms
-    # lambda: |-
-    #   it.fill(COLOR_OFF);
-    #   id(block_animation).next_frame();
-    #   it.image(0, 0, id(block_animation), COLOR_ON, COLOR_OFF);
-    # lambda: |-
-    #       static uint16_t xpos = 0;
-    #       const char * text = id(panel_text).state.c_str();
-     
-    #       int x_start, y_start;
-    #       int width, height;
-              
-    #       it.get_text_bounds(0, 0, text, id(tinyfont), 
-    #           TextAlign::TOP_LEFT, &x_start, &y_start, &width, &height); 
-          
-    #       it.print(-(xpos % (width + $xscrollpadding)), -2, 
-    #         id(tinyfont), Color(0xFF1010), 
-    #         TextAlign::TOP_LEFT, text); 
-    #       xpos++;
+    update_interval: 100ms
+    lambda: |-
+      static uint16_t run = 0;
+      static Animation* animation;
+      static uint16_t timer = 200;
+
+      timer = 200;
+
+      if (id(mylight).get_effect_name() == std::string("None")) {
+      } else if (id(my_select).state == std::string("${animation_1}")) {
+        animation = $animation_1;
+      } else if (id(my_select).state == std::string("${animation_2}")) {
+        animation = $animation_2;
+      } else if (id(my_select).state == std::string("${animation_3}")) {
+        animation = $animation_3;
+      } else if (id(my_select).state == std::string("${animation_4}")) {
+        animation = $animation_4;
+      } else if (id(my_select).state == std::string("${animation_5}")) {
+        animation = $animation_5;
+      } else if (id(my_select).state == std::string("${animation_6}")) {
+        animation = $animation_6;
+      } else if (id(my_select).state == std::string("${animation_7}")) {
+        timer = 800;
+        animation = $animation_7;
+      } else if (id(my_select).state == std::string("${animation_8}")) {
+        timer = 600;
+        animation = $animation_8;
+      } else if (id(my_select).state == std::string("${animation_9}")) {
+        animation = $animation_9;
+      } else if (id(my_select).state == std::string("${animation_10}")) {
+        animation = $animation_10;
+      } else if (id(my_select).state == std::string("${animation_11}")) {
+        animation = $animation_11;
+      } else if (id(my_select).state == std::string("${animation_12}")) {
+        animation = $animation_12;
+      } else if (id(my_select).state == std::string("${animation_13}")) {
+        animation = $animation_13;
+      } else if (id(my_select).state == std::string("${animation_14}")) {
+        animation = $animation_14;
+      } else if (id(my_select).state == std::string("${animation_15}")) {
+        animation = $animation_15;
+      } else if (id(my_select).state == std::string("${animation_16}")) {
+        animation = $animation_16;
+      } else if (id(my_select).state == std::string("${animation_17}")) {
+        animation = $animation_17;
+      } else if (id(my_select).state == std::string("${animation_18}")) {
+        timer = 500;
+        animation = $animation_18;
+      }
+
+      if (animation) {
+        if (run % (timer/100) == 0)
+          animation -> next_frame();
+        it.image(0, 0, animation, COLOR_ON, COLOR_OFF);
+      }
+      run++;

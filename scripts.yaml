@@ -5,7 +5,7 @@ neopixel_play:
           - condition: device
             type: is_on
             device_id: 6aed32ee9d50576fd0d8d98cc9e0b6fb
-            entity_id: light.joe_neopixel_panel_light
+            entity_id: light.fireplace
             domain: light
         sequence:
           - service: script.neopixel_up
@@ -17,7 +17,7 @@ neopixel_random:
   sequence:
     - service: light.turn_on
       target:
-        entity_id: light.joe_neopixel_panel_light
+        entity_id: light.fireplace
       data:
         effect: "{{states('sensor.neopixel_panel_effect_list').split(',') | random}}"
 
@@ -40,7 +40,7 @@ neopixel_down:
         value: "{{(states('input_number.neopixel_effect_index')|int) - 1}}"
     - service: light.turn_on
       target:
-        entity_id: light.joe_neopixel_panel_light
+        entity_id: light.fireplace
       data:
         effect: "{{states('sensor.neopixel_panel_effect_list').split(',')[states('input_number.neopixel_effect_index')|int]}}"
 
@@ -62,7 +62,7 @@ neopixel_up:
             value: "{{(states('input_number.neopixel_effect_index')|int) + 1}}"
     - service: light.turn_on
       target:
-        entity_id: light.joe_neopixel_panel_light
+        entity_id: light.fireplace
       data:
         effect: "{{states('sensor.neopixel_panel_effect_list').split(',')[states('input_number.neopixel_effect_index')|int]}}"
 
@@ -225,24 +225,24 @@ sprinkler_water_front:
     - delay: '00:01'
     - service: switch.turn_on
       entity_id: switch.sonoff_4ch_relay_1
-    - delay: '00:10'
+    - delay: '00:05'
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_1
     - delay: '00:01'
     - service: switch.turn_on
       entity_id: switch.sonoff_4ch_relay_2
-    - delay: '00:10'
+    - delay: '00:05'
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_2
     - delay: '00:01'
     - service: switch.turn_on
       entity_id: switch.sonoff_4ch_relay_3
-    - delay: '00:10'
+    - delay: '00:05'
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_3
     - delay: '00:01'
     - service: switch.turn_on
       entity_id: switch.sonoff_4ch_relay_4
-    - delay: '00:10'
+    - delay: '00:05'
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_4

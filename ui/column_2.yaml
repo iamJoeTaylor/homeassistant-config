@@ -1,13 +1,8 @@
-- control:
-    hvac:
-      fan_only: false
-      cool: false
-      heat_cool: false
-      auto: false
-      dry: false
-      heat: true
-      'off': true
+- type: 'custom:simple-thermostat'
   entity: climate.zen_thermostat
+  layout:
+    step: row
+  control: false
   header: false
   hide:
     temperature: true
@@ -23,7 +18,6 @@
       --st-font-size-m: 15px
       --st-font-size-xl: 40px;
       }
-  type: 'custom:simple-thermostat'
 
 - type: entities
   entities:

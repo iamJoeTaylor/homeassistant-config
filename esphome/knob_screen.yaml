@@ -48,19 +48,9 @@ esphome:
   board: ${boardName}
 
 wifi:
-  networks:
-    - ssid: !secret wifi_ssid
-      password: !secret wifi_pw
-      bssid: F8:BC:0E:8C:B3:86
-    - ssid: !secret wifi_ssid
-      password: !secret wifi_pw
-      bssid: F8:BC:0E:8C:B3:89
-    - ssid: !secret wifi_ssid
-      password: !secret wifi_pw
-      bssid: F8:BC:0E:8C:B3:83
-    - ssid: !secret wifi_ssid
-      password: !secret wifi_pw
-      bssid: 6C:AE:F6:87:FF:03
+  ssid: !secret wifi_ssid
+  password: !secret wifi_pw
+  fast_connect: true
 
 captive_portal:
 

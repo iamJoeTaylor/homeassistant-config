@@ -25,11 +25,7 @@
   entities:
     - entity: sensor.cyberpower1_battery_runtime
       name: Runtime
-    - entity: sensor.cyberpower1_input_voltage
-      name: Input V
     - entity: sensor.cyberpower1_load
       name: Load
-    - entity: sensor.cyberpower1_nominal_real_power
-      name: Real Power
     - entity: sensor.cyberpower1_status
       name: Status
