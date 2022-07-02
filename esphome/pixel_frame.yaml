@@ -8,6 +8,7 @@ substitutions:
   matrixheight: "16" # in pix
   scrollinterval: "0.2" # in seconds
   xscrollpadding: "4" # in pix
+  text_1: "pixel_frame_text"
   animation_1: "matrix"
   animation_2: "mona"
   animation_3: "goomba"
@@ -26,6 +27,11 @@ substitutions:
   animation_16: "octorok"
   animation_17: "water"
   animation_18: "zelda_walk"
+  animation_19: "stripe"
+  animation_20: "bryan"
+  animation_21: "stripe_logo"
+  animation_22: "stripe_block"
+  animation_23: "fox"
 
 esphome:
   name: $devicename
@@ -34,12 +40,10 @@ esphome:
   on_boot:
     priority: -10
     then: # stop the flickering
-      - lambda: |-
-            fastled_base_fastledlightoutput->get_controller()->setDither(0);
       - light.turn_on:
             id: mylight
             brightness: 100%
-            effect: $animation_5
+            effect: $animation_2
 
 wifi:
   ssid: !secret wifi_ssid
@@ -48,13 +52,23 @@ wifi:
 
 text_sensor:
   - platform: homeassistant
-    name: "input text"
-    entity_id: input_text.panel_text
+    name: "pixel frame input text"
+    entity_id: input_text.pixel_frame_text
     id: panel_text
+  - platform: homeassistant
+    name: "pixel frame input color"
+    entity_id: input_text.pixel_frame_color
+    id: panel_color
 
 logger:
 
 debug:
+
+# mqtt:
+#   id: mqtt_client
+#   broker: !secret mqtt_broker
+#   username: !secret mqtt_un
+#   password: !secret mqtt_pw
 
 ota:
 
@@ -64,7 +78,7 @@ api:
 font:
   - id: tinyfont
     file: "DejaVuSans-Bold.ttf"
-    size: 12
+    size: 10
     glyphs: "♡Ωäöüß!%()+,-_.:*=°?~#0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz"
 
 time:
@@ -72,11 +86,10 @@ time:
     id: rtctime
 
 light:
-  - platform: fastled_clockless
-    chipset: WS2812
+  - platform: neopixelbus
+    variant: WS2812
     pin: 3
     num_leds: 256
-    rgb_order: GRB
     name: "$devicename Light"
     id: mylight
     default_transition_length: 0s
@@ -86,6 +99,11 @@ light:
           id: mylight
           effect: $animation_7
     effects:
+      - lambda:
+          name: $text_1
+          update_interval: 1s
+          lambda: |-
+            id(my_select).make_call().set_option("$text_1").perform();
       - lambda:
           name: $animation_1
           update_interval: 1s
@@ -176,6 +194,31 @@ light:
           update_interval: 1s
           lambda: |-
             id(my_select).make_call().set_option("$animation_18").perform();
+      - lambda:
+          name: $animation_19
+          update_interval: 1s
+          lambda: |-
+            id(my_select).make_call().set_option("$animation_19").perform();
+      - lambda:
+          name: $animation_20
+          update_interval: 1s
+          lambda: |-
+            id(my_select).make_call().set_option("$animation_20").perform();
+      - lambda:
+          name: $animation_21
+          update_interval: 1s
+          lambda: |-
+            id(my_select).make_call().set_option("$animation_21").perform();
+      - lambda:
+          name: $animation_22
+          update_interval: 1s
+          lambda: |-
+            id(my_select).make_call().set_option("$animation_22").perform();
+      - lambda:
+          name: $animation_23
+          update_interval: 1s
+          lambda: |-
+            id(my_select).make_call().set_option("$animation_23").perform();
 
 animation:
   - file: "$animation_1.gif"
@@ -250,6 +293,31 @@ animation:
     id: $animation_18
     type: RGB24
     resize: 16x16
+  - file: "$animation_19.gif"
+    id: $animation_19
+    type: RGB24
+    resize: 16x16
+  - file: "$animation_20.png"
+    id: $animation_20
+    type: RGB24
+    resize: 16x16
+  - file: "$animation_21.png"
+    id: $animation_21
+    type: RGB24
+    resize: 16x16
+  - file: "$animation_22.gif"
+    id: $animation_22
+    type: rgb24
+    resize: 16x16
+  - file: "$animation_23.gif"
+    id: $animation_23
+    type: rgb24
+    resize: 16x16
+
+image:
+  - file: "$animation_21.png"
+    id: stripe_image
+    resize: 16x16
 
 select:
     - name: Pixel Frame Select
@@ -257,6 +325,7 @@ select:
       platform: template
       optimistic: true
       options:
+        - $text_1
         - $animation_1
         - $animation_2
         - $animation_3
@@ -275,6 +344,10 @@ select:
         - $animation_16
         - $animation_17
         - $animation_18
+        - $animation_19
+        - $animation_20
+        - $animation_21
+        - $animation_22
 
 display:
   - platform: addressable_light
@@ -293,10 +366,22 @@ display:
       static uint16_t run = 0;
       static Animation* animation;
       static uint16_t timer = 200;
+      const char * text;
+      static uint32_t color;
+      static uint16_t xpos_timer = 0;
+      static uint16_t xpos = 0;
 
       timer = 200;
 
       if (id(mylight).get_effect_name() == std::string("None")) {
+      } else if (id(my_select).state == std::string("${text_1}")) {
+        timer = 100;
+
+        text = id(panel_text).state.c_str();
+        const char * hexstring = id(panel_color).state.c_str();
+        color = strtol(hexstring, NULL, 16);
+
+        animation = NULL;
       } else if (id(my_select).state == std::string("${animation_1}")) {
         animation = $animation_1;
       } else if (id(my_select).state == std::string("${animation_2}")) {
@@ -336,11 +421,43 @@ display:
       } else if (id(my_select).state == std::string("${animation_18}")) {
         timer = 500;
         animation = $animation_18;
+      } else if (id(my_select).state == std::string("${animation_19}")) {
+        timer = 500;
+        animation = $animation_19;
+      } else if (id(my_select).state == std::string("${animation_20}")) {
+        animation = $animation_20;
+      } else if (id(my_select).state == std::string("${animation_20}")) {
+        animation = $animation_20;
+      } else if (id(my_select).state == std::string("${animation_21}")) {
+        animation = $animation_21;
       }
 
       if (animation) {
         if (run % (timer/100) == 0)
           animation -> next_frame();
         it.image(0, 0, animation, COLOR_ON, COLOR_OFF);
+      } else if (text) {
+        if (run % (timer/100) == 0) {
+          int x_start, y_start;
+          int width, height;
+
+          if (xpos_timer < 40) {
+            xpos = 0;
+          }
+          it.image(-(xpos % (width + $xscrollpadding + 25 + 40)), 0, id(stripe_image), Color(color), Color(0xFFFFFF));
+          it.get_text_bounds(0, 0, text, id(tinyfont),
+              TextAlign::TOP_LEFT, &x_start, &y_start, &width, &height);
+
+          it.print(-(xpos % (width + $xscrollpadding + 25 + 40)) + 19, 3,
+            id(tinyfont), Color(color),
+            TextAlign::TOP_LEFT, text);
+
+          xpos_timer++;
+          xpos++;
+          if (xpos_timer > width + 25 + 40) {
+            xpos_timer = 0;
+            xpos = 0;
+          }
+        }
       }
       run++;

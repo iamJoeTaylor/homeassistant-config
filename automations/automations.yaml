@@ -17,19 +17,19 @@
             critical: 1
             volume: 1.0
   - service: switch.turn_off
-    entity_id: switch.sonoff_power_on_off
+    entity_id: switch.ikea_plug_blue
 
 - alias: Turn sonoff power back on
   trigger:
   - platform: state
     entity_id:
-      - switch.sonoff_power_on_off
+      - switch.ikea_plug_blue
     to: 'off'
     for:
       minutes: 2
   action:
   - service: switch.turn_on
-    entity_id: switch.sonoff_power_on_off
+    entity_id: switch.ikea_plug_blue
 
 - alias: Notify if sprinklers left on for 10 minutes
   trigger:
@@ -39,6 +39,8 @@
       - switch.sonoff_4ch_relay_2
       - switch.sonoff_4ch_relay_3
       - switch.sonoff_4ch_relay_4
+      - switch.backyard_relay_1
+      - switch.backyard_relay_2
     to: 'on'
     for:
       minutes: 10
@@ -53,25 +55,7 @@
             critical: 1
             volume: 1.0
   - service: switch.turn_off
-    entity_id: switch.sonoff_power_on_off
-
-- alias: Turn on porch at night
-  trigger:
-    - platform: time
-      at: '19:00:00'
-  action:
-    entity_id: light.hue_porch
-    service: light.turn_on
-    data:
-      brightness: 10
-
-- alias: Turn off porch at night
-  trigger:
-  - platform: time
-    at: '00:00:00'
-  action:
-    entity_id: light.hue_porch
-    service: light.turn_off
+    entity_id: switch.ikea_plug_blue
 
 # - alias: Water Frontyard Morning
 #   trigger:

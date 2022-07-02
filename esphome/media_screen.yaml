@@ -1,0 +1,258 @@
+substitutions:
+  # UNIQUE NAME FOR THE DEVICE
+  deviceName: living_room_pithy_screen
+  deviceUpper: Living Room Pithy Screen
+
+  # ENTITY MAPPING FOR THE DIFFERENT FUNCTIONS
+  mediaPlayer: living_room_sonos # ID OF MEDIA PLAYER IN HA
+
+  # SWITCH MAPPING. SELECT THE SWITCH FOR EACH ACTION
+  switchMenu: ${sideSwitch}
+  switchAction: ${encoderSwitch}
+
+  # WIFI AND OTHER CREDENTIALS. USE SECRETS WHERE POSSIBLE
+  wifiSSID: !secret wifi_ssid
+  wifiPass: !secret wifi_pw
+
+  # ESP DECLARATION
+  boardPlatform: ESP8266
+  boardName: d1_mini
+
+  # PIN MAPPING. DEFAULTS TO ioios.io PITHY AND COUNTER DEVICES
+  encoderPinA: D5
+  encoderPinB: D6
+  encoderSwitch: D7
+  i2cData: D4
+  i2cClock: D3
+  pirSensor: D1
+  sideSwitch: TX
+  neoPixels: RX
+
+###############################################################################
+# WHOA WHERE ARE YOU GOING? GO STEADY BEYOND HERE, THIS IS THE BREAKABLE BIT! #
+###############################################################################
+
+esphome:
+  name: ${deviceName}
+  platform: ${boardPlatform}
+  board: ${boardName}
+  on_boot:
+    priority: 200
+    then:
+      - binary_sensor.template.publish:
+          id: api_connected
+          state: OFF
+      - wait_until:
+          api.connected
+      - delay: 15s
+      - binary_sensor.template.publish:
+          id: api_connected
+          state: ON
+
+wifi:
+  ssid: ${wifiSSID}
+  password: ${wifiPass}
+
+captive_portal:
+logger:
+ota:
+
+i2c:
+  sda: ${i2cData}
+  scl: ${i2cClock}
+  scan: True
+  frequency: 200MHz
+  id: bus_a
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+api:
+
+font:
+  - file: "fonts/LiberationSans-Regular.ttf"
+    id: title_font
+    size: 12
+    glyphs: ":/HTPS"
+  - file: "fonts/LiberationSans-Bold.ttf"
+    id: title_font_bold
+    size: 16
+    glyphs: "ios."
+  - file: "fonts/LiberationSans-Regular.ttf"
+    id: standard_font
+    size: 26
+    glyphs: ":/&!°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ."
+
+image:
+  - file: "images/play.png"
+    id: play_image
+    resize: 48x34
+  - file: "images/pause.png"
+    id: pause_image
+    resize: 48x34
+  - file: "images/volume.png"
+    id: volume_image
+    resize: 16x16
+  - file: "images/ioios.png"
+    id: ioios_image
+    resize: 48x48
+  - file: "images/ha.png"
+    id: ha_image
+    resize: 48x48
+
+display:
+  - platform: ssd1306_i2c
+    model: "SSD1306 128x64"
+    address: 0x3C
+    update_interval: 0.2s
+    pages:
+      - id: pageMedia
+        lambda: |-
+          if (!id(api_connected).state) {
+            it.printf(12, 2, id(title_font), TextAlign::TOP_LEFT, "HTTPS://");
+            it.printf(124, 0, id(title_font_bold), TextAlign::TOP_RIGHT, "ioios.io");
+
+            it.image(8, 16, id(ha_image));
+            it.image(72, 16, id(ioios_image));
+          } else {
+            it.image(0, 0, id(volume_image));
+            it.rectangle(20, 0, 102, 16);
+            it.filled_rectangle(21, 1, 20, 14);
+          }
+
+globals:
+  - id: new_volume
+    type: int
+    initial_value: '0'
+  - id: current_effect
+    type: std::string
+    initial_value: ''
+
+switch:
+  - platform: restart
+    name: "ESP Restart ${deviceUpper}"
+
+text_sensor:
+  - platform: homeassistant
+    id: media_state
+    entity_id: input_text.pixel_frame_text
+    internal: true
+  - platform: homeassistant
+    id: effect_list
+    entity_id: sensor.pixel_frame_entity_list
+    internal: true
+
+
+sensor:
+  - platform: wifi_signal
+    name: ESP Signal ${deviceUpper}
+    update_interval: 60s
+
+  - platform: uptime
+    name: ESP Uptime ${deviceUpper}
+    update_interval: 60s
+  - platform: sht3xd
+    temperature:
+      name: "${deviceUpper} Temperature"
+      id: ${deviceName}_temperature
+    humidity:
+      name: "${deviceUpper} Humidity"
+      id: ${deviceName}_humidity
+    address: 0x44
+    update_interval: 15s
+
+  - platform: rotary_encoder
+    id: media_dial
+    pin_a:
+      number: ${encoderPinA}
+      inverted: true
+      mode: INPUT_PULLUP
+    pin_b:
+      number: ${encoderPinB}
+      inverted: true
+      mode: INPUT_PULLUP
+    filters:
+      - debounce: 0.2s
+    resolution: 1
+    min_value: 1
+    max_value: 100
+    on_value:
+      - then:
+        - globals.set:
+            id: new_volume
+            value: !lambda 'return id(media_dial).state ;'
+        - globals.set:
+            id: current_effect
+            value: !lambda |-
+              std::string str = id(effect_list).state;
+              std::vector<std::string> v;
+              char * token;
+              char seps[] = ",";
+              token = strtok (&str[0],seps);
+              while (token != NULL)
+              {
+                v.push_back(token);
+                token = strtok (NULL, seps);
+              }
+              int index = id(new_volume);
+              if (index >= (int)(v.size())) {
+                index = index % ((int)(v.size()) - 1);
+              }
+              return v[index].c_str();
+        - logger.log: "Hello World"
+        - homeassistant.service:
+            service: light.turn_on
+            data_template:
+              entity_id: light.pixel_frame_light
+              effect: "{{ effect }}"
+            variables:
+              effect: !lambda |-
+                ESP_LOGD("test: ", "String to Vector: %s", id(current_effect).c_str());
+                return id(current_effect).c_str();
+
+
+binary_sensor:
+  - platform: template
+    id: api_connected
+
+  - platform: gpio
+    pin:
+      number: ${switchAction}
+      inverted: true
+      mode: INPUT_PULLUP
+    name: Action ${deviceUpper}
+    internal: true
+    on_multi_click:
+    - timing:
+      - ON for at most 1s
+      - OFF for at most 1s
+      - ON for at most 1s
+      - OFF for at least 0.2s
+      then:
+        - logger.log: "Double Click"
+    - timing:
+      - ON for 0.6s to 3s
+      - OFF for at least 0.1s
+      then:
+        - logger.log: "Long Click"
+    - timing:
+      - ON for at most 0.5s
+      - OFF for at least 0.4s
+      then:
+        - logger.log: "Single Click"
+
+  - platform: gpio
+    pin:
+      number: ${switchMenu}
+      inverted: true
+      mode: INPUT_PULLUP
+    name: Menu ${deviceUpper}
+    internal: true
+    on_multi_click:
+    - timing:
+        - ON for at most 0.5s
+        - OFF for at least 0.4s
+      then:
+        - delay: 8s
+        - display.page.show: pageMedia

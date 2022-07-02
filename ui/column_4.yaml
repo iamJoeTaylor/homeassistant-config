@@ -12,13 +12,11 @@
 - type: entities
   show_header_toggle: false
   entities:
-    - group.power_bar
-    - entity: switch.computer_power
+    - entity: switch.tuya_leds
+      name: LEDs
+    - entity: switch.tuya_computer
       name: Computer
       icon: 'mdi:desktop-tower-monitor'
-    - entity: switch.fountain_plug_on_off
-      name: Fountain
-      icon: 'mdi:fountain'
 
 - type: entities
   title: CyberPower

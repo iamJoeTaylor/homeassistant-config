@@ -20,6 +20,18 @@
 - sensor:
   - name: "NeoPixel Panel Entity List"
     state: "{{state_attr('light.fireplace', 'effect_list') | join(',')}}"
+- sensor:
+  - name: "Pixel Frame Entity List"
+    state: "{{state_attr('light.pixel_frame_light', 'effect_list') | join(',')}}"
+
+- sensor:
+  - name: "Living Room Warmth"
+    state: >
+      {{ state_attr('light.living_room_hue', 'color_temp') | round(0) }}
+- sensor:
+  - name: "Living Room Brightness"
+    state: >
+      {{ state_attr('light.living_room_hue', 'brightness') | round(0) }}
 
 - sensor:
   - unique_id: sprinkler_status

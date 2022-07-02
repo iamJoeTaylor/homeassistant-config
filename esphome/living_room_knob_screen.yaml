@@ -1,0 +1,430 @@
+substitutions:
+  # UNIQUE NAME FOR THE DEVICE
+  deviceName: living_room_knob_screen
+  deviceUpper: Living Room Knob Screen
+
+  # ENTITY MAPPING FOR THE DIFFERENT FUNCTIONS
+  lightGroup: living_room_hue # ID OF LIGHT GROUP IN HA
+
+  # SWITCH MAPPING. SELECT THE SWITCH FOR EACH ACTION
+  switchMenu: ${sideSwitch}
+  switchAction: ${encoderSwitch}
+
+  # WIFI AND OTHER CREDENTIALS. USE SECRETS WHERE POSSIBLE
+  wifiSSID: !secret wifi_ssid
+  wifiPass: !secret wifi_pw
+
+  # ESP DECLARATION
+  boardPlatform: ESP8266
+  boardName: d1_mini
+
+  # PIN MAPPING. DEFAULTS TO ioios.io PITHY AND COUNTER DEVICES
+  encoderPinA: D5
+  encoderPinB: D6
+  encoderSwitch: D7
+  i2cData: D4
+  i2cClock: D3
+  pirSensor: D1
+  sideSwitch: TX
+  neoPixels: RX
+
+###############################################################################
+# WHOA WHERE ARE YOU GOING? GO STEADY BEYOND HERE, THIS IS THE BREAKABLE BIT! #
+###############################################################################
+
+esphome:
+  name: ${deviceName}
+  platform: ${boardPlatform}
+  board: ${boardName}
+  on_boot:
+    priority: 200
+    then:
+      - binary_sensor.template.publish:
+          id: api_connected
+          state: OFF
+      - light.turn_on:
+          id: ${deviceName}_neopixel
+          brightness: 60%
+          red: 100%
+          green: 100%
+          blue: 100%
+          effect: "Knight Rider"
+
+      - wait_until:
+          api.connected
+      - delay: 15s
+      - binary_sensor.template.publish:
+          id: api_connected
+          state: ON
+      - light.turn_off:
+          id: ${deviceName}_neopixel
+
+wifi:
+  ssid: ${wifiSSID}
+  password: ${wifiPass}
+
+captive_portal:
+logger:
+ota:
+
+i2c:
+  sda: ${i2cData}
+  scl: ${i2cClock}
+  scan: True
+  frequency: 200MHz
+  id: bus_a
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+api:
+
+font:
+  - file: "fonts/LiberationSans-Regular.ttf"
+    id: title_font
+    size: 12
+    glyphs: ":/HTPS"
+  - file: "fonts/LiberationSans-Bold.ttf"
+    id: title_font_bold
+    size: 16
+    glyphs: "ios."
+  - file: "fonts/Paul.ttf"
+    id: small_font
+    size: 16
+    glyphs: ":!0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ."
+  - file: "fonts/Paul.ttf"
+    id: standard_font
+    size: 26
+    glyphs: ":/&!°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ."
+
+image:
+  - file: "images/alert.png"
+    id: alert_image
+    resize: 48x48
+  - file: "images/dinner.png"
+    id: dinner_image
+    resize: 48x48
+  - file: "images/door.png"
+    id: door_image
+    resize: 34x48
+  - file: "images/warmth.png"
+    id: warmth_image
+    resize: 16x16
+  - file: "images/brightness.png"
+    id: brightness_image
+    resize: 16x16
+  - file: "images/ioios.png"
+    id: ioios_image
+    resize: 48x48
+  - file: "images/ha.png"
+    id: ha_image
+    resize: 48x48
+
+display:
+  - platform: ssd1306_i2c
+    model: "SH1106 128x64"
+    address: 0x3C
+    update_interval: 0.1s
+    id: i2cDisplay
+    pages:
+      - id: pageMain
+        lambda: |-
+          if (!id(api_connected).state) {
+            it.printf(12, 2, id(title_font), TextAlign::TOP_LEFT, "HTTPS://");
+            it.printf(124, 0, id(title_font_bold), TextAlign::TOP_RIGHT, "ioios.io");
+
+            it.image(8, 16, id(ha_image));
+            it.image(72, 16, id(ioios_image));
+          } else {
+            if(id(menu_tracker) != 0) id(menu_tracker) = 0;
+          }
+
+      - id: pageBrightness
+        lambda: |-
+          if(id(menu_tracker) != 1) id(menu_tracker) = 1;
+
+          it.image(0, 0, id(brightness_image));
+          it.rectangle(20, 0, 102, 16);
+          it.filled_rectangle(21, 1, id(percent_brightness), 14);
+          it.printf(64, 38, id(small_font), TextAlign::BOTTOM_CENTER, "Lights");
+          it.printf(64, 64, id(standard_font), TextAlign::BOTTOM_CENTER, "Brightness");
+
+      - id: pageWarmth
+        lambda: |-
+          if(id(menu_tracker) != 2) id(menu_tracker) = 2;
+
+          it.image(0, 0, id(warmth_image));
+          it.rectangle(20, 0, 102, 16);
+          it.filled_rectangle(21, 1, id(percent_warmth), 14);
+          it.printf(64, 38, id(small_font), TextAlign::BOTTOM_CENTER, "White");
+          it.printf(64, 64, id(standard_font), TextAlign::BOTTOM_CENTER, "Warmth");
+
+globals:
+  - id: menu_tracker
+    type: int
+    initial_value: '0'
+
+  - id: local_brightness
+    type: int
+    initial_value: '0'
+  - id: percent_brightness
+    type: int
+    initial_value: '0'
+
+  - id: local_warmth
+    type: int
+    initial_value: '0'
+  - id: percent_warmth
+    type: int
+    initial_value: '0'
+
+switch:
+  - platform: restart
+    name: "ESP Restart ${deviceUpper}"
+
+
+sensor:
+  - platform: wifi_signal
+    name: ESP Signal ${deviceUpper}
+    update_interval: 60s
+
+  - platform: uptime
+    name: ESP Uptime ${deviceUpper}
+    update_interval: 60s
+  - platform: sht3xd
+    temperature:
+      name: "${deviceUpper} Temperature"
+      id: ${deviceName}_temperature
+    humidity:
+      name: "${deviceUpper} Humidity"
+      id: ${deviceName}_humidity
+    address: 0x44
+    update_interval: 15s
+
+  - platform: rotary_encoder
+    id: rotary_dial
+    pin_a:
+      number: ${encoderPinA}
+      inverted: true
+      mode: INPUT_PULLUP
+    pin_b:
+      number: ${encoderPinB}
+      inverted: true
+      mode: INPUT_PULLUP
+    filters:
+      - debounce: 0.05s
+    resolution: 1
+    min_value: 1
+    max_value: 100
+    on_value:
+      then:
+        - if:
+            condition:
+              lambda: 'return id(menu_tracker) == 1;'
+            then:
+              - globals.set:
+                  id: local_brightness
+                  value: !lambda |-
+                    ESP_LOGD("test: ", "brightness: %i", (id(rotary_dial).state / 100) * 256);
+                    return (id(rotary_dial).state / 100) * 256;
+              - globals.set:
+                  id: percent_brightness
+                  value: !lambda 'return (id(local_brightness) / 256) * 100;'
+              - homeassistant.service:
+                  service: light.turn_on
+                  data_template:
+                    entity_id: light.${lightGroup}
+                    brightness: "{{ brightness | int }}"
+                  variables:
+                    brightness: !lambda |-
+                      ESP_LOGD("test: ", "brightness: %i", id(local_brightness));
+                      return id(local_brightness);
+            else:
+              - if:
+                  condition:
+                    lambda: 'return id(menu_tracker) == 2;'
+                  then:
+                    - globals.set:
+                        id: local_warmth
+                        value: !lambda |-
+                          ESP_LOGD("test: ", "warmth: %i", (id(rotary_dial).state / 100) * 312 + 153);
+                          return (id(rotary_dial).state / 100) * 312 + 153;
+                    - globals.set:
+                        id: percent_warmth
+                        value: !lambda 'return ((id(local_warmth) - 153) / (465 - 153)) * 100;'
+                    - homeassistant.service:
+                        service: light.turn_on
+                        data_template:
+                          entity_id: light.${lightGroup}
+                          color_temp: "{{ warmth | int }}"
+                        variables:
+                          warmth: !lambda 'return id(local_warmth);'
+                  else:
+                    - if:
+                        condition:
+                          lambda: 'return id(menu_tracker) == 0;'
+                        then:
+                          - display.page.show: pageBrightness
+                          - globals.set:
+                              id: local_brightness
+                              value: !lambda |-
+                                ESP_LOGD("test: ", "brightness: %i", (id(rotary_dial).state / 100) * 256);
+                                return (id(rotary_dial).state / 100) * 256;
+                          - globals.set:
+                              id: percent_brightness
+                              value: !lambda 'return (id(local_brightness) / 256) * 100;'
+                          - homeassistant.service:
+                              service: light.turn_on
+                              data_template:
+                                entity_id: light.${lightGroup}
+                                brightness: "{{ brightness | int }}"
+                              variables:
+                                brightness: !lambda |-
+                                  ESP_LOGD("test: ", "brightness: %i", id(local_brightness));
+                                  return id(local_brightness);
+
+
+  - platform: homeassistant
+    id: brightness
+    entity_id: sensor.${lightGroup}_brightness
+    on_value:
+      then:
+        - globals.set:
+            id: percent_brightness
+            value: !lambda 'return (x / 256) * 100;'
+
+  - platform: homeassistant
+    id: warmth
+    entity_id: sensor.${lightGroup}_warmth
+    on_value:
+      then:
+        - globals.set:
+            id: percent_warmth
+            value: !lambda 'return ((x - 153) / (465 - 153)) * 100;'
+
+binary_sensor:
+  - platform: template
+    id: api_connected
+
+  - platform: gpio
+    pin:
+      number: ${switchMenu}
+      inverted: true
+      mode: INPUT_PULLUP
+    name: Menu ${deviceUpper}
+    internal: true
+    on_press:
+      then:
+        - logger.log: "Next Page"
+        - display.page.show_next: i2cDisplay
+        - delay: 0.1s
+        - if:
+            condition:
+              lambda: 'return id(menu_tracker) == 0;'
+            then:
+              - logger.log: "Switched to main page"
+            else:
+              - if:
+                  condition:
+                    lambda: 'return id(menu_tracker) == 1;'
+                  then:
+                    - logger.log: "Switched to brightness page"
+                    - sensor.rotary_encoder.set_value:
+                        id: rotary_dial
+                        value: !lambda 'return id(brightness).state;'
+                  else:
+                    - if:
+                        condition:
+                          lambda: 'return id(menu_tracker) == 2;'
+                        then:
+                          - logger.log: "Switched to warmth page"
+                          - sensor.rotary_encoder.set_value:
+                              id: rotary_dial
+                              value: !lambda 'return id(warmth).state;'
+
+light:
+  - platform: neopixelbus
+    type: GRB
+    pin: ${neoPixels}
+    num_leds: 3
+    id: ${deviceName}_neopixel
+    name: "${deviceUpper} Ring"
+    effects:
+      - addressable_rainbow:
+          name: Rainbow
+      - addressable_color_wipe:
+          name: Colour Wipe
+      - addressable_scan:
+          name: Knight Rider
+          move_interval: 150ms
+          scan_width: 1
+      - addressable_twinkle:
+      - addressable_fireworks:
+      - addressable_random_twinkle:
+          name: Occasional Twinkle
+          twinkle_probability: 1%
+          progress_interval: 50ms
+      - automation:
+          name: Alarm Sequence
+          sequence:
+            - light.addressable_set:
+                id: ${deviceName}_neopixel
+                red: 100%
+                green: 0%
+                blue: 0%
+            - delay: 400ms
+            - light.addressable_set:
+                id: ${deviceName}_neopixel
+                red: 0%
+                green: 0%
+                blue: 0%
+            - delay: 200ms
+            - light.addressable_set:
+                id: ${deviceName}_neopixel
+                red: 100%
+                green: 0%
+                blue: 0%
+            - delay: 400ms
+            - light.addressable_set:
+                id: ${deviceName}_neopixel
+                red: 0%
+                green: 0%
+                blue: 0%
+            - delay: 200ms
+            - light.addressable_set:
+                id: ${deviceName}_neopixel
+                red: 100%
+                green: 0%
+                blue: 0%
+            - delay: 400ms
+            - light.addressable_set:
+                id: ${deviceName}_neopixel
+                red: 0%
+                green: 0%
+                blue: 0%
+            - delay: 200ms
+            - light.addressable_set:
+                id: ${deviceName}_neopixel
+                red: 100%
+                green: 100%
+                blue: 100%
+            - delay: 100ms
+            - light.addressable_set:
+                id: ${deviceName}_neopixel
+                red: 0%
+                green: 0%
+                blue: 100%
+            - delay: 200ms
+            - light.addressable_set:
+                id: ${deviceName}_neopixel
+                red: 100%
+                green: 100%
+                blue: 100%
+            - delay: 100ms
+            - light.addressable_set:
+                id: ${deviceName}_neopixel
+                red: 0%
+                green: 0%
+                blue: 0%
+            - delay: 200ms

@@ -139,9 +139,6 @@ sun:
 
 system_health:
 
-# Checks for available updates
-updater:
-
 ## Section: Integration Config
 
 ios:
@@ -150,6 +147,47 @@ ios:
 conversation:
 
 homekit:
+  entity_config:
+    switch.sonoff_4ch_relay_1:
+      type: sprinkler
+    switch.sonoff_4ch_relay_2:
+      type: sprinkler
+    switch.sonoff_4ch_relay_3:
+      type: sprinkler
+    switch.sonoff_4ch_relay_4:
+      type: sprinkler
+    switch.backyard_relay_1:
+      type: sprinkler
+    switch.backyard_relay_2:
+      type: sprinkler
+  filter:
+    include_entities:
+      - binary_sensor.front_door_status_sensor
+      - binary_sensor.back_door_status_sensor
+      - binary_sensor.studio_door_status_sensor
+    exclude_domains:
+        # Accessory mode entities as per https://www.home-assistant.io/integrations/homekit/#accessory-mode
+      - media_player
+      - remote
+      - lock
+      - camera
+      - cover
+        # Others
+      - group
+      - automation
+      - sensor
+      - script
+      - device_tracker
+      - climate
+      - binary_sensor
+      - person
+      - alarm_control_panel
+    exclude_entity_globs:
+      - switch.khaljoego_*
+      - input_boolean.*_heat
+    exclude_entities:
+      - light.backyard_blue_led
+
 
 ## Section: Component configuration
 

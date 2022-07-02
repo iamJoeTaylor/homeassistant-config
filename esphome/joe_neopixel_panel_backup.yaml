@@ -32,9 +32,13 @@ esphome:
   name: $devicename
   platform: ESP8266
   board: d1_mini
+  includes:
+    - my_matrixled_scrolling_display.h
   on_boot:
     priority: -10
     then: # stop the flickering
+      - lambda: |-
+            fastled_base_fastledlightoutput->get_controller()->setDither(0);
       - light.turn_on:
             id: mylight
             brightness: 100%
@@ -71,12 +75,14 @@ time:
     id: rtctime
 
 light:
-  - platform: neopixelbus
-    variant: WS2812
+  - platform: fastled_clockless
+    chipset: WS2812
     pin: 3
     num_leds: 256
+    rgb_order: GRB
     name: "fireplace"
     id: mylight
+    default_transition_length: 0s
     color_correct: [50%, 50%, 50%]
     on_turn_on:
       - light.turn_on:

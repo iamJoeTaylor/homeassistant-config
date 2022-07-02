@@ -12,6 +12,7 @@
               icon: 'mdi:track-light'
             - entity: light.hue_studio_lamp
             - entity: light.canvas
+            - entity: switch.workbench_plug
             - entity: switch.studio_heater_plug_on_off
 
     - type: vertical-stack

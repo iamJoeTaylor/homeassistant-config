@@ -1,3 +1,14 @@
+substitutions:
+  # PIN MAPPING. DEFAULTS TO ioios.io PITHY AND COUNTER DEVICES
+  encoderPinA: D5
+  encoderPinB: D6
+  encoderSwitch: D7
+  i2cData: D4
+  i2cClock: D3
+  # pirSensor: D1
+  sideSwitch: TX
+  neoPixels: RX
+
 esphome:
   name: knob_plain
   platform: ESP8266
@@ -6,11 +17,6 @@ esphome:
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_pw
-
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
-  ap:
-    ssid: "Knob Plain Fallback Hotspot"
-    password: "QdnKmoqMPiuH"
 
 captive_portal:
 
@@ -21,3 +27,23 @@ logger:
 api:
 
 ota:
+
+sensor:
+  - platform: rotary_encoder
+    id: rotary_dial
+    pin_a:
+      number: ${encoderPinA}
+      inverted: true
+      mode: INPUT_PULLUP
+    pin_b:
+      number: ${encoderPinB}
+      inverted: true
+      mode: INPUT_PULLUP
+    filters:
+      - debounce: 0.1s
+    resolution: 2
+    min_value: 0
+    max_value: 465
+    on_value:
+      then:
+        - logger.log: "Hello World"
