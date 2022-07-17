@@ -59,6 +59,3 @@
           name: Water Off
     - type: light
       entity: light.sonoff_4ch_blue_led
-- type: vertical-stack
-  cards:
-    - type: custom:scheduler-card

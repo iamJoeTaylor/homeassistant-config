@@ -1,0 +1,299 @@
+esphome:
+  name: rgb_light_board
+  platform: ESP32
+  board: nodemcu-32s
+  # on_boot:
+  #   priority: -10
+  #   then:
+  #     - output.turn_on: hue_led
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_pw
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+text_sensor:
+  - platform: homeassistant
+    name: "Effect List for Nanoleaf"
+    id: effect_list_string
+    entity_id: sensor.nanoleaf_entity_list
+
+sensor:
+
+  - platform: adc
+    pin: GPIO36
+    name: "slider 1"
+    id: slide1
+    update_interval: 2s
+    attenuation: 11db
+    filters:
+      - delta: 0.1
+      - lambda: return x/3.9;
+    on_value:
+      then:
+        - if:
+            condition:
+              lambda: 'return id(hue_power).state && (id(global_light_state) == 0 || id(global_light_state) == 1);'
+            then:
+              - homeassistant.service:
+                  service: light.turn_on
+                  data_template:
+                    entity_id: light.bella_hue
+                    hs_color: "[{{(hue | float * 360) |round|int }}, {{(sat | float * 100) |round|int }}]"
+                  variables:
+                    hue: 'return id(slide1).state ;'
+                    sat: 'return id(slide2).state ;'
+        - if:
+            condition:
+              lambda: 'return id(nano_power).state && (id(global_light_state) == 0 || id(global_light_state) == 2);'
+            then:
+              - homeassistant.service:
+                  service: light.turn_on
+                  data_template:
+                    entity_id: light.nanoleaf
+                    hs_color: "[{{(hue | float * 360) |round|int }}, {{(sat | float * 100) |round|int }}]"
+                  variables:
+                    hue: 'return id(slide1).state ;'
+                    sat: 'return id(slide2).state ;'
+  - platform: adc
+    pin: GPIO39
+    name: "slider 2"
+    id: slide2
+    update_interval: 2s
+    attenuation: 11db
+    # accuracy_decimals: 1
+    filters:
+      # - heartbeat: 5s
+      # - debounce: 0.1s
+      - delta: 0.1
+      - lambda: return x/3.9;
+    on_value:
+      then:
+        - if:
+            condition:
+              lambda: 'return id(hue_power).state && (id(global_light_state) == 0 || id(global_light_state) == 1);'
+            then:
+              - homeassistant.service:
+                  service: light.turn_on
+                  data_template:
+                    entity_id: light.bella_hue
+                    hs_color: "[{{(hue | float * 360) |round|int }}, {{(sat | float * 100) |round|int }}]"
+                  variables:
+                    hue: 'return id(slide1).state ;'
+                    sat: 'return id(slide2).state ;'
+        - if:
+            condition:
+              lambda: 'return id(nano_power).state && (id(global_light_state) == 0 || id(global_light_state) == 2);'
+            then:
+              - homeassistant.service:
+                  service: light.turn_on
+                  data_template:
+                    entity_id: light.nanoleaf
+                    hs_color: "[{{(hue | float * 360) |round|int }}, {{(sat | float * 100) |round|int }}]"
+                  variables:
+                    hue: 'return id(slide1).state ;'
+                    sat: 'return id(slide2).state ;'
+  - platform: adc
+    pin: GPIO34
+    name: "slider 3"
+    id: slide3
+    update_interval: 2s
+    attenuation: 11db
+    filters:
+      - delta: 0.1
+      - lambda: return x/3.9;
+    on_value:
+      then:
+        - if:
+            condition:
+              lambda: 'return id(hue_power).state && (id(global_light_state) == 0 || id(global_light_state) == 1);'
+            then:
+              - homeassistant.service:
+                  service: light.turn_on
+                  data_template:
+                    entity_id: light.bella_hue
+                    brightness_pct: "{{(pct | float * 100) |round|int }}"
+                  variables:
+                    pct: 'return id(slide3).state ;'
+        - if:
+            condition:
+              lambda: 'return id(nano_power).state && (id(global_light_state) == 0 || id(global_light_state) == 2);'
+            then:
+              - homeassistant.service:
+                  service: light.turn_on
+                  data_template:
+                    entity_id: light.nanoleaf
+                    brightness_pct: "{{(pct | float * 100) |round|int }}"
+                  variables:
+                    pct: 'return id(slide3).state ;'
+
+
+  - platform: rotary_encoder
+    name: "Rotary Encoder"
+    id: enc1
+    pin_a:
+      number: GPIO4
+      mode: INPUT_PULLUP
+    pin_b:
+      number: GPIO16
+      mode: INPUT_PULLUP
+    filters:
+      - or:
+        - debounce: 0.2s
+        - delta: 5
+    resolution: 1
+    min_value: 0
+    max_value: 100
+    on_value:
+      then:
+        - homeassistant.service:
+            service: light.turn_on
+            data_template:
+              entity_id: light.nanoleaf
+              effect: >-
+                {% set effect_list = effect_list_string.split(',') %}
+                {% set effect_list_count = effect_list|count %}
+                {% set rotary_int = rotary | int %}
+
+                {{effect_list[rotary_int % effect_list_count]}}
+            variables:
+              effect_list_string: 'return id(effect_list_string).state;'
+              rotary: 'return id(enc1).state;'
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO19
+      mode: INPUT_PULLUP
+    id: hue_power
+    name: "Hue Power"
+    filters:
+      - invert:
+    on_state:
+      if:
+        condition:
+          binary_sensor.is_on: hue_power
+        then:
+          - output.turn_on: hue_led
+          - homeassistant.service:
+              service: light.turn_on
+              data_template:
+                entity_id: light.bella_hue
+                hs_color: "[{{(hue | float * 360) |round|int }}, {{(sat | float * 100) |round|int }}]"
+                brightness_pct: "{{(pct | float * 100) |round|int }}"
+              variables:
+                hue: 'return id(slide1).state ;'
+                sat: 'return id(slide2).state ;'
+                pct: 'return id(slide3).state ;'
+        else:
+          - output.turn_off: hue_led
+          - homeassistant.service:
+              service: light.turn_off
+              data_template:
+                entity_id: light.bella_hue
+  - platform: gpio
+    pin:
+      number: GPIO18
+      mode: INPUT_PULLUP
+    id: nano_power
+    name: "Nano Power"
+    filters:
+      - invert:
+    on_state:
+      if:
+        condition:
+          binary_sensor.is_on: nano_power
+        then:
+          - output.turn_on: nano_led
+          - homeassistant.service:
+              service: light.turn_on
+              data_template:
+                entity_id: light.nanoleaf
+                hs_color: "[{{(hue | float * 360) |round|int }}, {{(sat | float * 100) |round|int }}]"
+                brightness_pct: "{{(pct | float * 100) |round|int }}"
+              variables:
+                hue: 'return id(slide1).state ;'
+                sat: 'return id(slide2).state ;'
+                pct: 'return id(slide3).state ;'
+        else:
+          - output.turn_off: nano_led
+          - homeassistant.service:
+              service: light.turn_off
+              data_template:
+                entity_id: light.nanoleaf
+
+  - platform: gpio
+    pin:
+      number: GPIO17
+      mode: INPUT_PULLUP
+    id: switch1
+    name: "Rotary switch 1"
+    on_press:
+      then:
+        lambda: |-
+          if (id(global_light_state) < 2) {
+            id(global_light_state) += 1;
+          } else {
+            id(global_light_state) = 0;
+          }
+
+
+
+globals:
+  - id: global_light_state
+    type: int
+    restore_value: no
+    initial_value: "0" # [0:'both', 1:'hue', 2:'nano']
+
+
+switch:
+  - name: "Hue State"
+    platform: template
+    optimistic: true
+    id: hue_state
+    lambda: |-
+      if (id(global_light_state) == 0 || id(global_light_state) == 1) {
+        return true;
+      } else {
+        return false;
+      }
+    restore_state: true
+    on_turn_on:
+      then:
+        - output.turn_on: hue_led
+    on_turn_off:
+      then:
+        - output.turn_off: hue_led
+  - name: "Nano State"
+    platform: template
+    optimistic: true
+    id: nano_state
+    lambda: |-
+      if (id(global_light_state) == 0 || id(global_light_state) == 2) {
+        return true;
+      } else {
+        return false;
+      }
+    restore_state: true
+    on_turn_on:
+      then:
+        - output.turn_on: nano_led
+    on_turn_off:
+      then:
+        - output.turn_off: nano_led
+
+output:
+  - platform: gpio
+    pin: GPIO2
+    id: hue_led
+  - platform: gpio
+    pin: GPIO15
+    id: nano_led

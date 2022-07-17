@@ -40,7 +40,12 @@ views:
     path: water
     theme: Google Dark Theme
     title: Yard
-    cards: !include ui/yard.yaml
+    cards:
+      # Main Single Full Width Column
+      - type: vertical-stack
+        cards:
+          - type: vertical-stack
+            cards: !include ui/yard.yaml
 
   - panel: true
     icon: 'mdi:file-cog-outline'

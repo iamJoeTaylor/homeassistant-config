@@ -95,26 +95,6 @@
         ha-card {
           --mdc-icon-size: 12px;
         }
-    - entities:
-        - entity: sensor.purpleair
-          index: 0
-      font_size: 60
-      font_size_header: 10
-      icon: 'mdi:chart-line'
-      color_thresholds:
-        - value: 50
-          color: "#f39c12"
-        - value: 100
-          color: "#d35400"
-        - value: 150
-          color: "#c0392b"
-      line_width: 8
-      name: Berk
-      type: 'custom:mini-graph-card'
-      style: |
-        ha-card {
-          --mdc-icon-size: 12px;
-        }
 
 
 - type: vertical-stack
