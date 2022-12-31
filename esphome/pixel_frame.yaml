@@ -28,10 +28,8 @@ substitutions:
   animation_17: "water"
   animation_18: "zelda_walk"
   animation_19: "stripe"
-  animation_20: "bryan"
   animation_21: "stripe_logo"
   animation_22: "stripe_block"
-  animation_23: "fox"
 
 esphome:
   name: $devicename
@@ -97,13 +95,29 @@ light:
     on_turn_on:
       - light.turn_on:
           id: mylight
-          effect: $animation_7
+          effect: Random
     effects:
       - lambda:
           name: $text_1
           update_interval: 1s
           lambda: |-
             id(my_select).make_call().set_option("$text_1").perform();
+      - lambda:
+          name: Random
+          update_interval: 5s
+          lambda: |-
+            static int select_size = id(my_select).size();\
+            if (id(mylight).get_effect_name() == std::string("Random")) {
+              std::srand(std::time(nullptr));
+              int random_index = (std::rand() % (select_size + 1)) - 1;
+              ESP_LOGI("main", "Option at %d", random_index);
+              ESP_LOGI("main", "Option at %d is: %s", random_index, id(my_select).at(random_index).value());
+
+              std::vector all_effects = id(mylight).get_effects();
+              auto call = id(mylight).make_call();
+              call.set_effect(random_index + 1);
+              call.perform();
+            }
       - lambda:
           name: $animation_1
           update_interval: 1s
@@ -200,11 +214,6 @@ light:
           lambda: |-
             id(my_select).make_call().set_option("$animation_19").perform();
       - lambda:
-          name: $animation_20
-          update_interval: 1s
-          lambda: |-
-            id(my_select).make_call().set_option("$animation_20").perform();
-      - lambda:
           name: $animation_21
           update_interval: 1s
           lambda: |-
@@ -214,11 +223,6 @@ light:
           update_interval: 1s
           lambda: |-
             id(my_select).make_call().set_option("$animation_22").perform();
-      - lambda:
-          name: $animation_23
-          update_interval: 1s
-          lambda: |-
-            id(my_select).make_call().set_option("$animation_23").perform();
 
 animation:
   - file: "$animation_1.gif"
@@ -297,20 +301,12 @@ animation:
     id: $animation_19
     type: RGB24
     resize: 16x16
-  - file: "$animation_20.png"
-    id: $animation_20
-    type: RGB24
-    resize: 16x16
   - file: "$animation_21.png"
     id: $animation_21
     type: RGB24
     resize: 16x16
   - file: "$animation_22.gif"
     id: $animation_22
-    type: rgb24
-    resize: 16x16
-  - file: "$animation_23.gif"
-    id: $animation_23
     type: rgb24
     resize: 16x16
 
@@ -345,7 +341,6 @@ select:
         - $animation_17
         - $animation_18
         - $animation_19
-        - $animation_20
         - $animation_21
         - $animation_22
 
@@ -424,10 +419,6 @@ display:
       } else if (id(my_select).state == std::string("${animation_19}")) {
         timer = 500;
         animation = $animation_19;
-      } else if (id(my_select).state == std::string("${animation_20}")) {
-        animation = $animation_20;
-      } else if (id(my_select).state == std::string("${animation_20}")) {
-        animation = $animation_20;
       } else if (id(my_select).state == std::string("${animation_21}")) {
         animation = $animation_21;
       }

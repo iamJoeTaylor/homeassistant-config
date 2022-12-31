@@ -40,7 +40,6 @@
       show_header_toggle: false
       entities:
         - entity: switch.landscape_lights
-        - entity: switch.ikea_plug_blue
         - entity: input_boolean.skip_watering
         - entity: input_boolean.turn_off_watering
     - type: history-graph

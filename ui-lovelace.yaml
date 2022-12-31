@@ -62,23 +62,6 @@ views:
     cards: !include ui/configuration.yaml
 
 
-  - panel: true
-    icon: 'mdi:graphql'
-    path: zigbee
-    theme: Google Dark Theme
-    title: Zigbee
-    cards:
-      - type: 'custom:zha-network-visualization-card'
-
-  - panel: true
-    icon: 'mdi:texture-box'
-    path: heat
-    theme: Google Dark Theme
-    title: Heater Control
-    cards:
-      - type: vertical-stack
-        cards: !include ui/heater.yaml
-
   - panel: false
     icon: 'mdi:warehouse'
     path: studio

@@ -18,12 +18,12 @@
       name: Computer
       icon: 'mdi:desktop-tower-monitor'
 
-- type: entities
-  title: CyberPower
-  entities:
-    - entity: sensor.cyberpower1_battery_runtime
-      name: Runtime
-    - entity: sensor.cyberpower1_load
-      name: Load
-    - entity: sensor.cyberpower1_status
-      name: Status
+# - type: entities
+#   title: CyberPower
+#   entities:
+#     - entity: sensor.cyberpower1_battery_runtime
+#       name: Runtime
+#     - entity: sensor.cyberpower1_load
+#       name: Load
+#     - entity: sensor.cyberpower1_status
+#       name: Status

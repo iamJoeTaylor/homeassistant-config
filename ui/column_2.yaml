@@ -19,40 +19,40 @@
       --st-font-size-xl: 40px;
       }
 
-- type: entities
-  entities:
-    - entity: fan.pure_cool_link
-      hide_when_off: true
-      name: Dyson
-      toggle: true
-      type: 'custom:slider-entity-row'
-    - type: 'custom:button-toolbar-redux'
-      style: |
-        ha-card {
-          --bt-toolbar-background: var(--paper-card-background-color);
-          --bt-icon-active-color: var(--accent-color)
-          }
-      toolbar:
-        - type: service
-          name: Toggle
-          icon: mdi:refresh
-          service:
-            name: fan.oscillate
-            entity: fan.pure_cool_link
-            parameter: oscillating
-            toggle: true
-        - type: service
-          name: Auto
-          icon: mdi:auto-fix
-          service:
-            name: switch.toggle
-            entity: switch.pure_cool_link_auto_mode
-        - type: service
-          name: Toggle
-          icon: mdi:weather-night
-          service:
-            name: switch.toggle
-            entity: switch.pure_cool_link_night_mode
+- type: vertical-stack
+  cards:
+    - show_header_toggle: false
+      type: entities
+      entities:
+        - entity: light.fireplace
+          hide_when_off: true
+          name: Fireplace
+          toggle: true
+          attribute: effect
+          type: 'custom:slider-entity-row'
+        - type: 'custom:button-toolbar-redux'
+          style: |
+            ha-card {
+              --bt-icon-active-color: var(--accent-color)
+              }
+          toolbar:
+            - type: service
+              name: Down
+              icon: mdi:skip-previous-outline
+              service:
+                name: script.neopixel_down
+            - type: service
+              name: Auto
+              icon: mdi:animation-play
+              service:
+                name: script.neopixel_play
+            - type: service
+              name: Up
+              icon: mdi:skip-next-outline
+              service:
+                name: script.neopixel_up
+
+
 
 - type: weather-forecast
   entity: weather.home
