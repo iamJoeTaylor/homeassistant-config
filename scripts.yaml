@@ -225,24 +225,24 @@ sprinkler_water_front:
     - delay: '00:01'
     - service: switch.turn_on
       entity_id: switch.sonoff_4ch_relay_1
-    - delay: '00:05'
+    - delay: '00:08'
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_1
     - delay: '00:01'
     - service: switch.turn_on
       entity_id: switch.sonoff_4ch_relay_2
-    - delay: '00:05'
+    - delay: '00:08'
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_2
     - delay: '00:01'
     - service: switch.turn_on
       entity_id: switch.sonoff_4ch_relay_3
-    - delay: '00:05'
+    - delay: '00:08'
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_3
     - delay: '00:01'
     - service: switch.turn_on
       entity_id: switch.sonoff_4ch_relay_4
-    - delay: '00:05'
+    - delay: '00:08'
     - service: switch.turn_off
       entity_id: switch.sonoff_4ch_relay_4

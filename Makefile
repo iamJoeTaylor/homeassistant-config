@@ -1,7 +1,7 @@
 BASE_DIR="$(shell pwd)"
 CALENDAR_DIR=~/Development/calendar_notification
 REMOTE_HOST=pi@192.168.7.171
-REMOTE_CONFIG_DIR=/usr/share/hassio/homeassistant
+REMOTE_CONFIG_DIR=/config
 
 .PHONY: test
 test:

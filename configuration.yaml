@@ -5,6 +5,7 @@ homeassistant:
   # Location required to calculate the time the sun rises and sets
   latitude: !secret home_latitude
   longitude: !secret home_longitude
+  country: US
   # Impacts weather/sunrise data (altitude above sea level in meters)
   elevation: !secret home_elevation
   # metric for Metric, imperial for Imperial
@@ -16,8 +17,12 @@ homeassistant:
     - type: homeassistant
     - type: trusted_networks
       trusted_networks:
-        - 192.168.7.173
+        - 192.168.7.171
+      trusted_users:
+        192.168.7.171:
+          - fc462bbe12fa486cae13bc66b04c7709
       allow_bypass_login: true
+
 
 http:
 cloud:
@@ -109,9 +114,9 @@ history:
 
 mobile_app:
 
-google:
-  client_id: !secret google_client_id
-  client_secret: !secret google_client_secret
+# google:
+#   client_id: !secret google_client_id
+#   client_secret: !secret google_client_secret
 
 # device_tracker:
 #   - platform: eero_tracker
